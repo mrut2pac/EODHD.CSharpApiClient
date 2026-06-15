@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — screener, macro, market cap)
+- Stock-market screener (`GetScreener[Async]`) with strongly-typed `ScreenerFilter` conditions
+  (serialized to EODHD's `[field, operation, value]` triples), pre-defined `signals`, `sort`,
+  `limit`, and `offset`. The `data` envelope is unwrapped to a `ScreenerResult[]`.
+- Macroeconomic indicators (`GetMacroIndicator[Async]`) covering all 39 indicators via a
+  `MacroIndicator` enum, per country (ISO 3166-1 alpha-3 or World Bank aggregate code).
+- Historical market capitalisation (`GetHistoricalMarketCap[Async]`) — the API's index-keyed
+  object is projected into a date-ordered `HistoricalMarketCap[]`.
+- Unit tests for all three groups; `SkippableFact` integration tests (verified live).
+
 ### Packaging
 - Ship a symbol package (`.snupkg`) with Source Link (`Microsoft.SourceLink.GitHub`) and a
   deterministic build, so consumers can step into the client source while debugging. Source
