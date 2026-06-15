@@ -27,5 +27,12 @@ namespace EODHD.CSharpApiClient
         /// Gets or sets the per-request HTTP timeout. Default: 5 minutes (suitable for large bulk fetches).
         /// </summary>
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(5);
+
+        /// <summary>
+        /// Gets or sets an optional client-side rate limit in requests per minute. When set to a positive
+        /// value the client gates every request through a leaky-bucket limiter so the configured rate is
+        /// not exceeded. <c>null</c> (the default) disables client-side limiting and relies on the server.
+        /// </summary>
+        public int? MaxRequestsPerMinute { get; set; }
     }
 }

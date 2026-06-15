@@ -1,11 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.DataModel;
+using EODHD.CSharpApiClient.DataModel.BulkFundamental;
+using EODHD.CSharpApiClient.DataModel.ExchangeInfo;
+using EODHD.CSharpApiClient.DataModel.Fundamental;
+using EODHD.CSharpApiClient.DataModel.UpcomingEarnings;
+using EODHD.CSharpApiClient.DataModel.UpcomingSplits;
 using EODHD.CSharpApiClient.Exceptions;
 using EODHD.CSharpApiClient.Transport;
 
@@ -19,14 +28,20 @@ namespace EODHD.CSharpApiClient
     /// </summary>
     public sealed class EodhdClient : IDisposable
     {
+        private const string DateFormat = "yyyy-MM-dd";
+
         private readonly EodhdClientOptions options;
         private readonly IHttpTransport transport;
+        private readonly RequestRateLimiter rateLimiter;
 
         // Property names are matched case-insensitively so EODHD's camelCase wire fields bind to the
-        // PascalCase model properties even where a [JsonPropertyName] is not declared.
+        // PascalCase model properties even where a [JsonPropertyName] is not declared. EODHD also
+        // string-encodes some numeric fields, so numbers are allowed to be read from JSON strings —
+        // this is set once here rather than with a per-property attribute on every model.
         private static readonly JsonSerializerOptions DeserializeOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
         };
 
         /// <summary>
@@ -56,6 +71,11 @@ namespace EODHD.CSharpApiClient
             if(this.options.BaseUri == null)
             {
                 throw new ArgumentException("BaseUri must be set.", nameof(options));
+            }
+
+            if(this.options.MaxRequestsPerMinute.HasValue && this.options.MaxRequestsPerMinute.Value > 0)
+            {
+                this.rateLimiter = new RequestRateLimiter(this.options.MaxRequestsPerMinute.Value);
             }
 
             if(transport != null)
@@ -98,22 +118,450 @@ namespace EODHD.CSharpApiClient
             return this.GetUserInfoAsync().GetAwaiter().GetResult();
         }
 
+        // ================================================================
+        // Exchanges API
+        // ================================================================
+
         /// <summary>
-        /// Releases the underlying HTTP transport (and its <see cref="HttpClient"/>).
+        /// Returns details (name, operating hours, holidays) for an exchange.
         /// </summary>
-        public void Dispose()
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="from">Optional inclusive start date for the holidays range.</param>
+        /// <param name="to">Optional inclusive end date for the holidays range.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The exchange details.</returns>
+        public Task<ExchangeDetails> GetExchangeDetailsAsync(string exchangeCode, DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
         {
-            this.transport.Dispose();
+            if(string.IsNullOrWhiteSpace(exchangeCode))
+            {
+                throw new ArgumentNullException(nameof(exchangeCode));
+            }
+
+            return this.GetJsonAsync<ExchangeDetails>(
+                "exchange-details/" + Uri.EscapeDataString(exchangeCode),
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)));
         }
 
         /// <summary>
-        /// Issues a GET against <paramref name="pathAndQuery"/> (relative to the base URI, excluding the
-        /// <c>api_token</c> and <c>fmt</c> parameters, which are appended automatically) and deserializes
-        /// the JSON response body into <typeparamref name="T"/>.
+        /// Returns details (name, operating hours, holidays) for an exchange.
         /// </summary>
-        private async Task<T> GetJsonAsync<T>(string pathAndQuery, CancellationToken ct)
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="from">Optional inclusive start date for the holidays range.</param>
+        /// <param name="to">Optional inclusive end date for the holidays range.</param>
+        /// <returns>The exchange details.</returns>
+        public ExchangeDetails GetExchangeDetails(string exchangeCode, DateTime? from = null, DateTime? to = null)
         {
-            Uri uri = this.BuildRequestUri(pathAndQuery);
+            return this.GetExchangeDetailsAsync(exchangeCode, from, to).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns the history of ticker symbol changes across exchanges.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The symbol-change records.</returns>
+        public Task<SymbolChange[]> GetSymbolChangeHistoryAsync(DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<SymbolChange[]>(
+                "symbol-change-history",
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)));
+        }
+
+        /// <summary>
+        /// Returns the history of ticker symbol changes across exchanges.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <returns>The symbol-change records.</returns>
+        public SymbolChange[] GetSymbolChangeHistory(DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetSymbolChangeHistoryAsync(from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Exchange Symbols API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the list of symbols traded on an exchange.
+        /// </summary>
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="delisted">When <see langword="true"/>, returns delisted symbols instead of active ones.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The exchange symbols.</returns>
+        public Task<List<ExchangeSymbol>> GetExchangeSymbolsAsync(string exchangeCode, bool delisted = false, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(exchangeCode))
+            {
+                throw new ArgumentNullException(nameof(exchangeCode));
+            }
+
+            return this.GetJsonAsync<List<ExchangeSymbol>>(
+                "exchange-symbol-list/" + Uri.EscapeDataString(exchangeCode),
+                ct,
+                ("delisted", delisted ? "1" : null));
+        }
+
+        /// <summary>
+        /// Returns the list of symbols traded on an exchange.
+        /// </summary>
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="delisted">When <see langword="true"/>, returns delisted symbols instead of active ones.</param>
+        /// <returns>The exchange symbols.</returns>
+        public List<ExchangeSymbol> GetExchangeSymbols(string exchangeCode, bool delisted = false)
+        {
+            return this.GetExchangeSymbolsAsync(exchangeCode, delisted).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Calendar API
+        // ================================================================
+
+        /// <summary>
+        /// Returns upcoming earnings announcements, optionally filtered by date range and symbols.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="symbols">Optional list of symbols to filter to.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The upcoming earnings.</returns>
+        public Task<UpcomingEarnings> GetUpcomingEarningsAsync(DateTime? from = null, DateTime? to = null, IReadOnlyList<string> symbols = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<UpcomingEarnings>(
+                "calendar/earnings",
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)),
+                ("symbols", JoinSymbols(symbols)));
+        }
+
+        /// <summary>
+        /// Returns upcoming earnings announcements, optionally filtered by date range and symbols.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="symbols">Optional list of symbols to filter to.</param>
+        /// <returns>The upcoming earnings.</returns>
+        public UpcomingEarnings GetUpcomingEarnings(DateTime? from = null, DateTime? to = null, IReadOnlyList<string> symbols = null)
+        {
+            return this.GetUpcomingEarningsAsync(from, to, symbols).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns upcoming stock splits, optionally filtered by date range.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The upcoming splits.</returns>
+        public Task<UpcomingSplits> GetUpcomingSplitsAsync(DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<UpcomingSplits>(
+                "calendar/splits",
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)));
+        }
+
+        /// <summary>
+        /// Returns upcoming stock splits, optionally filtered by date range.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <returns>The upcoming splits.</returns>
+        public UpcomingSplits GetUpcomingSplits(DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetUpcomingSplitsAsync(from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // End-of-Day Historical Stock Market Data API
+        // ================================================================
+
+        /// <summary>
+        /// Returns end-of-day historical OHLCV bars for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="from">Inclusive start date.</param>
+        /// <param name="to">Inclusive end date.</param>
+        /// <param name="period">Aggregation period (daily, weekly, monthly).</param>
+        /// <param name="ascending">When <see langword="true"/> (default), bars are returned oldest-first.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The historical bars.</returns>
+        public Task<List<HistoricalStockPrice>> GetEndOfDayHistoricalStockPricesAsync(string symbol, DateTime from, DateTime to, EndOfDayPeriod period, bool ascending = true, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol))
+            {
+                throw new ArgumentNullException(nameof(symbol));
+            }
+
+            return this.GetJsonAsync<List<HistoricalStockPrice>>(
+                "eod/" + Uri.EscapeDataString(symbol),
+                ct,
+                ("from", from.ToString(DateFormat, CultureInfo.InvariantCulture)),
+                ("to", to.ToString(DateFormat, CultureInfo.InvariantCulture)),
+                ("period", ((char)period).ToString()),
+                ("order", ascending ? null : "d"));
+        }
+
+        /// <summary>
+        /// Returns end-of-day historical OHLCV bars for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="from">Inclusive start date.</param>
+        /// <param name="to">Inclusive end date.</param>
+        /// <param name="period">Aggregation period (daily, weekly, monthly).</param>
+        /// <param name="ascending">When <see langword="true"/> (default), bars are returned oldest-first.</param>
+        /// <returns>The historical bars.</returns>
+        public List<HistoricalStockPrice> GetEndOfDayHistoricalStockPrices(string symbol, DateTime from, DateTime to, EndOfDayPeriod period, bool ascending = true)
+        {
+            return this.GetEndOfDayHistoricalStockPricesAsync(symbol, from, to, period, ascending).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Fundamental Data API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the full fundamentals dataset for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="filters">Optional EODHD <c>filter</c> expression to return only part of the dataset.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The fundamentals data.</returns>
+        public Task<FundamentalData> GetFundamentalsDataAsync(string symbol, string filters = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol))
+            {
+                throw new ArgumentNullException(nameof(symbol));
+            }
+
+            return this.GetJsonAsync<FundamentalData>(
+                "fundamentals/" + Uri.EscapeDataString(symbol),
+                ct,
+                ("filter", filters));
+        }
+
+        /// <summary>
+        /// Returns the full fundamentals dataset for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="filters">Optional EODHD <c>filter</c> expression to return only part of the dataset.</param>
+        /// <returns>The fundamentals data.</returns>
+        public FundamentalData GetFundamentalsData(string symbol, string filters = null)
+        {
+            return this.GetFundamentalsDataAsync(symbol, filters).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns bulk fundamentals for all symbols on an exchange, keyed by symbol code.
+        /// </summary>
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="symbols">Optional list of symbols to restrict the response to.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A dictionary of bulk fundamentals keyed by symbol code.</returns>
+        public Task<Dictionary<string, BulkFundamentalData>> GetBulkFundamentalsDataAsync(string exchangeCode, int? offset = null, int? limit = null, IReadOnlyList<string> symbols = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(exchangeCode))
+            {
+                throw new ArgumentNullException(nameof(exchangeCode));
+            }
+
+            return this.GetJsonAsync<Dictionary<string, BulkFundamentalData>>(
+                "bulk-fundamentals/" + Uri.EscapeDataString(exchangeCode),
+                ct,
+                ("offset", FormatInt(offset)),
+                ("limit", FormatInt(limit)),
+                ("symbols", JoinSymbols(symbols)));
+        }
+
+        /// <summary>
+        /// Returns bulk fundamentals for all symbols on an exchange, keyed by symbol code.
+        /// </summary>
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="symbols">Optional list of symbols to restrict the response to.</param>
+        /// <returns>A dictionary of bulk fundamentals keyed by symbol code.</returns>
+        public Dictionary<string, BulkFundamentalData> GetBulkFundamentalsData(string exchangeCode, int? offset = null, int? limit = null, IReadOnlyList<string> symbols = null)
+        {
+            return this.GetBulkFundamentalsDataAsync(exchangeCode, offset, limit, symbols).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns the extended (version 1.2) bulk fundamentals for an exchange as a list.
+        /// </summary>
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="symbols">Optional list of symbols to restrict the response to.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The bulk fundamentals records.</returns>
+        public Task<List<BulkFundamentalData>> GetBulkFundamentalsExtendedDataAsync(string exchangeCode, int? offset = null, int? limit = null, IReadOnlyList<string> symbols = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(exchangeCode))
+            {
+                throw new ArgumentNullException(nameof(exchangeCode));
+            }
+
+            return this.GetJsonAsync<List<BulkFundamentalData>>(
+                "bulk-fundamentals/" + Uri.EscapeDataString(exchangeCode),
+                ct,
+                ("version", "1.2"),
+                ("offset", FormatInt(offset)),
+                ("limit", FormatInt(limit)),
+                ("symbols", JoinSymbols(symbols)));
+        }
+
+        /// <summary>
+        /// Returns the extended (version 1.2) bulk fundamentals for an exchange as a list.
+        /// </summary>
+        /// <param name="exchangeCode">The EODHD exchange code (e.g. <c>"US"</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="symbols">Optional list of symbols to restrict the response to.</param>
+        /// <returns>The bulk fundamentals records.</returns>
+        public List<BulkFundamentalData> GetBulkFundamentalsExtendedData(string exchangeCode, int? offset = null, int? limit = null, IReadOnlyList<string> symbols = null)
+        {
+            return this.GetBulkFundamentalsExtendedDataAsync(exchangeCode, offset, limit, symbols).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Dividends and Splits
+        // ================================================================
+
+        /// <summary>
+        /// Returns the historical stock splits for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The historical splits.</returns>
+        public Task<HistoricalSplit[]> GetHistoricalSplitsAsync(string symbol, DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol))
+            {
+                throw new ArgumentNullException(nameof(symbol));
+            }
+
+            return this.GetJsonAsync<HistoricalSplit[]>(
+                "splits/" + Uri.EscapeDataString(symbol),
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)));
+        }
+
+        /// <summary>
+        /// Returns the historical stock splits for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <returns>The historical splits.</returns>
+        public HistoricalSplit[] GetHistoricalSplits(string symbol, DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetHistoricalSplitsAsync(symbol, from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Bulk API for EOD, Splits and Dividends
+        // ================================================================
+
+        /// <summary>
+        /// Returns the bulk end-of-day prices for all US symbols for a single day.
+        /// </summary>
+        /// <param name="date">The trading day to fetch; <c>null</c> returns the most recent available day.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The bulk end-of-day prices.</returns>
+        public Task<BulkHistoricalStockPrice[]> GetBulkEndOfDayHistoricalStockPricesAsync(DateTime? date = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<BulkHistoricalStockPrice[]>(
+                "eod-bulk-last-day/US",
+                ct,
+                ("date", FormatDate(date)));
+        }
+
+        /// <summary>
+        /// Returns the bulk end-of-day prices for all US symbols for a single day.
+        /// </summary>
+        /// <param name="date">The trading day to fetch; <c>null</c> returns the most recent available day.</param>
+        /// <returns>The bulk end-of-day prices.</returns>
+        public BulkHistoricalStockPrice[] GetBulkEndOfDayHistoricalStockPrices(DateTime? date = null)
+        {
+            return this.GetBulkEndOfDayHistoricalStockPricesAsync(date).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns the bulk stock splits for all US symbols for a single day.
+        /// </summary>
+        /// <param name="date">The trading day to fetch; <c>null</c> returns the most recent available day.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The bulk splits.</returns>
+        public Task<BulkHistoricalSplit[]> GetBulkHistoricalSplitsAsync(DateTime? date = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<BulkHistoricalSplit[]>(
+                "eod-bulk-last-day/US",
+                ct,
+                ("type", "splits"),
+                ("date", FormatDate(date)));
+        }
+
+        /// <summary>
+        /// Returns the bulk stock splits for all US symbols for a single day.
+        /// </summary>
+        /// <param name="date">The trading day to fetch; <c>null</c> returns the most recent available day.</param>
+        /// <returns>The bulk splits.</returns>
+        public BulkHistoricalSplit[] GetBulkHistoricalSplits(DateTime? date = null)
+        {
+            return this.GetBulkHistoricalSplitsAsync(date).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Releases the underlying HTTP transport (and its <see cref="HttpClient"/>) and the rate limiter.
+        /// </summary>
+        public void Dispose()
+        {
+            this.rateLimiter?.Dispose();
+            this.transport.Dispose();
+        }
+
+        private static string FormatDate(DateTime? date)
+        {
+            return date?.ToString(DateFormat, CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatInt(int? value)
+        {
+            return value?.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string JoinSymbols(IReadOnlyList<string> symbols)
+        {
+            return symbols != null && symbols.Count > 0 ? string.Join(",", symbols) : null;
+        }
+
+        /// <summary>
+        /// Issues a GET against <paramref name="path"/> (relative to the base URI) with the supplied query
+        /// parameters (the <c>api_token</c> and <c>fmt=json</c> parameters are appended automatically; any
+        /// query parameter with a <see langword="null"/> value is omitted) and deserializes the JSON
+        /// response body into <typeparamref name="T"/>.
+        /// </summary>
+        private async Task<T> GetJsonAsync<T>(string path, CancellationToken ct, params (string Name, string Value)[] query)
+        {
+            if(this.rateLimiter != null)
+            {
+                await this.rateLimiter.GateRequestAsync().ConfigureAwait(false);
+            }
+
+            Uri uri = this.BuildRequestUri(path, query);
 
             using(HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
             using(HttpResponseMessage response = await this.transport.SendAsync(request, ct).ConfigureAwait(false))
@@ -132,15 +580,26 @@ namespace EODHD.CSharpApiClient
         }
 
         /// <summary>
-        /// Builds the absolute request URI from a relative path/query, appending the <c>api_token</c> and
-        /// <c>fmt=json</c> parameters with the correct separator.
+        /// Builds the absolute request URI from a relative path and query parameters, appending the
+        /// <c>api_token</c> and <c>fmt=json</c> parameters and skipping any parameter with a null value.
         /// </summary>
-        private Uri BuildRequestUri(string pathAndQuery)
+        private Uri BuildRequestUri(string path, (string Name, string Value)[] query)
         {
-            Uri uri = new Uri(this.options.BaseUri, pathAndQuery);
-            string separator = string.IsNullOrEmpty(uri.Query) ? "?" : "&";
-            string full = uri + separator + "api_token=" + Uri.EscapeDataString(this.options.ApiToken) + "&fmt=json";
-            return new Uri(full);
+            StringBuilder builder = new StringBuilder(new Uri(this.options.BaseUri, path).ToString());
+            builder.Append("?api_token=").Append(Uri.EscapeDataString(this.options.ApiToken)).Append("&fmt=json");
+
+            if(query != null)
+            {
+                foreach((string Name, string Value) parameter in query)
+                {
+                    if(parameter.Value != null)
+                    {
+                        builder.Append('&').Append(parameter.Name).Append('=').Append(Uri.EscapeDataString(parameter.Value));
+                    }
+                }
+            }
+
+            return new Uri(builder.ToString());
         }
     }
 }
