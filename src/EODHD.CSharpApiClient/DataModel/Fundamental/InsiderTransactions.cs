@@ -52,7 +52,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the transaction amount, as a count of shares.
         /// </summary>
-        public long? TransactionAmount { get; set; }
+        public decimal? TransactionAmount { get; set; }
 
         /// <summary>
         /// Gets or sets the transaction price, as a price.
@@ -67,7 +67,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the post-transaction amount, as a count of shares.
         /// </summary>
-        public long? PostTransactionAmount { get; set; }
+        public decimal? PostTransactionAmount { get; set; }
 
         /// <summary>
         /// Gets or sets the SEC filing link.

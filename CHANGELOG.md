@@ -16,6 +16,12 @@ All notable changes to this project are documented here. The format is based on
   IPO calendar (`GetUpcomingIpos[Async]`).
 - Unit tests for the new converters and endpoints; `SkippableFact` integration tests.
 
+### Fixed
+- Widened large financial / share-count fundamentals fields (e.g. `Shares`, `EBITDA`,
+  `RevenueTTM`, `SharesOutstanding`, `EnterpriseValue`, crypto supply) from `long` to
+  `decimal?` — EODHD returns these with decimals / beyond `Int64` range, which threw
+  during deserialization. Surfaced by running the integration suite against live data.
+
 ### Added
 - Initial repository scaffold: solution, package metadata, MIT license, CI + publish
   workflows (NuGet Trusted Publishing / OIDC), and the testing layout.

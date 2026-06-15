@@ -28,7 +28,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the enterprise value (currency).
         /// </summary>
-        public long? EnterpriseValue { get; set; }
+        public decimal? EnterpriseValue { get; set; }
 
         /// <summary>
         /// Gets or sets the enterprise-value-to-revenue ratio.

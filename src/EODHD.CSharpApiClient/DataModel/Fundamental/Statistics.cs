@@ -18,12 +18,12 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the circulating supply, as a count.
         /// </summary>
-        public long? CirculatingSupply { get; set; }
+        public decimal? CirculatingSupply { get; set; }
 
         /// <summary>
         /// Gets or sets the total supply, as a count.
         /// </summary>
-        public long? TotalSupply { get; set; }
+        public decimal? TotalSupply { get; set; }
 
         /// <summary>
         /// Gets or sets the market-cap dominance (percent).

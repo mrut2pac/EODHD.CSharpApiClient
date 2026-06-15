@@ -131,7 +131,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the number of holdings (count).
         /// </summary>
         [JsonPropertyName("Holdings_Count")]
-        public long? HoldingsCount { get; set; }
+        public decimal? HoldingsCount { get; set; }
 
         /// <summary>
         /// Gets or sets the top 10 holdings keyed by symbol.
