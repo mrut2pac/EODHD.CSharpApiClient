@@ -39,12 +39,12 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the number of shares sold short, as a count.
         /// </summary>
-        public long? SharesShort { get; set; }
+        public decimal? SharesShort { get; set; }
 
         /// <summary>
         /// Gets or sets the number of shares sold short in the prior month, as a count.
         /// </summary>
-        public long? SharesShortPriorMonth { get; set; }
+        public decimal? SharesShortPriorMonth { get; set; }
 
         /// <summary>
         /// Gets or sets the short ratio.

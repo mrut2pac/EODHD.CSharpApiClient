@@ -14,6 +14,7 @@ using EODHD.CSharpApiClient.DataModel.BulkFundamental;
 using EODHD.CSharpApiClient.DataModel.ExchangeInfo;
 using EODHD.CSharpApiClient.DataModel.Fundamental;
 using EODHD.CSharpApiClient.DataModel.UpcomingEarnings;
+using EODHD.CSharpApiClient.DataModel.UpcomingIpos;
 using EODHD.CSharpApiClient.DataModel.UpcomingSplits;
 using EODHD.CSharpApiClient.Exceptions;
 using EODHD.CSharpApiClient.Transport;
@@ -524,6 +525,246 @@ namespace EODHD.CSharpApiClient
             return this.GetBulkHistoricalSplitsAsync(date).GetAwaiter().GetResult();
         }
 
+        // ================================================================
+        // Intraday Historical Data API
+        // ================================================================
+
+        /// <summary>
+        /// Returns intraday OHLCV bars for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="interval">Bar interval. Defaults to five minutes.</param>
+        /// <param name="from">Optional inclusive start (UTC); EODHD limits the range to ~120 days.</param>
+        /// <param name="to">Optional inclusive end (UTC).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The intraday bars.</returns>
+        public Task<List<IntradayHistoricalStockPrice>> GetIntradayHistoricalStockPricesAsync(string symbol, IntradayInterval interval = IntradayInterval.FiveMinutes, DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol))
+            {
+                throw new ArgumentNullException(nameof(symbol));
+            }
+
+            return this.GetJsonAsync<List<IntradayHistoricalStockPrice>>(
+                "intraday/" + Uri.EscapeDataString(symbol),
+                ct,
+                ("interval", IntervalToString(interval)),
+                ("from", FormatUnix(from)),
+                ("to", FormatUnix(to)));
+        }
+
+        /// <summary>
+        /// Returns intraday OHLCV bars for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="interval">Bar interval. Defaults to five minutes.</param>
+        /// <param name="from">Optional inclusive start (UTC); EODHD limits the range to ~120 days.</param>
+        /// <param name="to">Optional inclusive end (UTC).</param>
+        /// <returns>The intraday bars.</returns>
+        public List<IntradayHistoricalStockPrice> GetIntradayHistoricalStockPrices(string symbol, IntradayInterval interval = IntradayInterval.FiveMinutes, DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetIntradayHistoricalStockPricesAsync(symbol, interval, from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Dividends API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the historical dividends for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The historical dividends.</returns>
+        public Task<HistoricalDividend[]> GetHistoricalDividendsAsync(string symbol, DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol))
+            {
+                throw new ArgumentNullException(nameof(symbol));
+            }
+
+            return this.GetJsonAsync<HistoricalDividend[]>(
+                "div/" + Uri.EscapeDataString(symbol),
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)));
+        }
+
+        /// <summary>
+        /// Returns the historical dividends for a symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <returns>The historical dividends.</returns>
+        public HistoricalDividend[] GetHistoricalDividends(string symbol, DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetHistoricalDividendsAsync(symbol, from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Live / Delayed (Real-Time) API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the live (delayed ~15–20 min) quote for a single symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The live quote.</returns>
+        public Task<LiveStockPrice> GetLivePriceAsync(string symbol, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol))
+            {
+                throw new ArgumentNullException(nameof(symbol));
+            }
+
+            return this.GetJsonAsync<LiveStockPrice>("real-time/" + Uri.EscapeDataString(symbol), ct);
+        }
+
+        /// <summary>
+        /// Returns the live (delayed ~15–20 min) quote for a single symbol.
+        /// </summary>
+        /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
+        /// <returns>The live quote.</returns>
+        public LiveStockPrice GetLivePrice(string symbol)
+        {
+            return this.GetLivePriceAsync(symbol).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns live (delayed ~15–20 min) quotes for several symbols in a single request. EODHD
+        /// recommends no more than 15–20 symbols per call.
+        /// </summary>
+        /// <param name="primarySymbol">The primary EODHD symbol (path segment).</param>
+        /// <param name="additionalSymbols">Additional symbols sent via the <c>s</c> parameter.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>One quote per requested symbol.</returns>
+        public Task<LiveStockPrice[]> GetLivePricesAsync(string primarySymbol, IReadOnlyList<string> additionalSymbols, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(primarySymbol))
+            {
+                throw new ArgumentNullException(nameof(primarySymbol));
+            }
+
+            return this.GetJsonAsync<LiveStockPrice[]>(
+                "real-time/" + Uri.EscapeDataString(primarySymbol),
+                ct,
+                ("s", JoinSymbols(additionalSymbols)));
+        }
+
+        /// <summary>
+        /// Returns live (delayed ~15–20 min) quotes for several symbols in a single request. EODHD
+        /// recommends no more than 15–20 symbols per call.
+        /// </summary>
+        /// <param name="primarySymbol">The primary EODHD symbol (path segment).</param>
+        /// <param name="additionalSymbols">Additional symbols sent via the <c>s</c> parameter.</param>
+        /// <returns>One quote per requested symbol.</returns>
+        public LiveStockPrice[] GetLivePrices(string primarySymbol, IReadOnlyList<string> additionalSymbols)
+        {
+            return this.GetLivePricesAsync(primarySymbol, additionalSymbols).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Search API
+        // ================================================================
+
+        /// <summary>
+        /// Searches active tickers by symbol, company name, or ISIN.
+        /// </summary>
+        /// <param name="query">The search query (ticker, name, or ISIN).</param>
+        /// <param name="limit">Optional maximum number of results (default 15, max 500).</param>
+        /// <param name="type">Optional asset-type filter (e.g. <c>"stock"</c>, <c>"etf"</c>, <c>"all"</c>).</param>
+        /// <param name="exchange">Optional exchange-code filter (e.g. <c>"US"</c>).</param>
+        /// <param name="bondsOnly">When <see langword="true"/>, restricts results to bonds.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The matching instruments.</returns>
+        public Task<SearchResult[]> SearchAsync(string query, int? limit = null, string type = null, string exchange = null, bool bondsOnly = false, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(query))
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            return this.GetJsonAsync<SearchResult[]>(
+                "search/" + Uri.EscapeDataString(query),
+                ct,
+                ("limit", FormatInt(limit)),
+                ("type", type),
+                ("exchange", exchange),
+                ("bonds_only", bondsOnly ? "1" : null));
+        }
+
+        /// <summary>
+        /// Searches active tickers by symbol, company name, or ISIN.
+        /// </summary>
+        /// <param name="query">The search query (ticker, name, or ISIN).</param>
+        /// <param name="limit">Optional maximum number of results (default 15, max 500).</param>
+        /// <param name="type">Optional asset-type filter (e.g. <c>"stock"</c>, <c>"etf"</c>, <c>"all"</c>).</param>
+        /// <param name="exchange">Optional exchange-code filter (e.g. <c>"US"</c>).</param>
+        /// <param name="bondsOnly">When <see langword="true"/>, restricts results to bonds.</param>
+        /// <returns>The matching instruments.</returns>
+        public SearchResult[] Search(string query, int? limit = null, string type = null, string exchange = null, bool bondsOnly = false)
+        {
+            return this.SearchAsync(query, limit, type, exchange, bondsOnly).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Exchanges List API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the list of all exchanges (and asset-class venues) supported by EODHD.
+        /// </summary>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The exchanges.</returns>
+        public Task<List<Exchange>> GetExchangesListAsync(CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<List<Exchange>>("exchanges-list/", ct);
+        }
+
+        /// <summary>
+        /// Returns the list of all exchanges (and asset-class venues) supported by EODHD.
+        /// </summary>
+        /// <returns>The exchanges.</returns>
+        public List<Exchange> GetExchangesList()
+        {
+            return this.GetExchangesListAsync().GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Calendar — IPOs
+        // ================================================================
+
+        /// <summary>
+        /// Returns the IPO calendar, optionally filtered by date range.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The IPO calendar.</returns>
+        public Task<UpcomingIpos> GetUpcomingIposAsync(DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<UpcomingIpos>(
+                "calendar/ipos",
+                ct,
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)));
+        }
+
+        /// <summary>
+        /// Returns the IPO calendar, optionally filtered by date range.
+        /// </summary>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <returns>The IPO calendar.</returns>
+        public UpcomingIpos GetUpcomingIpos(DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetUpcomingIposAsync(from, to).GetAwaiter().GetResult();
+        }
+
         /// <summary>
         /// Releases the underlying HTTP transport (and its <see cref="HttpClient"/>) and the rate limiter.
         /// </summary>
@@ -541,6 +782,31 @@ namespace EODHD.CSharpApiClient
         private static string FormatInt(int? value)
         {
             return value?.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatUnix(DateTime? date)
+        {
+            if(!date.HasValue)
+            {
+                return null;
+            }
+
+            DateTime utc = DateTime.SpecifyKind(date.Value, DateTimeKind.Utc);
+            return new DateTimeOffset(utc).ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string IntervalToString(IntradayInterval interval)
+        {
+            switch(interval)
+            {
+                case IntradayInterval.OneMinute:
+                    return "1m";
+                case IntradayInterval.OneHour:
+                    return "1h";
+                case IntradayInterval.FiveMinutes:
+                default:
+                    return "5m";
+            }
         }
 
         private static string JoinSymbols(IReadOnlyList<string> symbols)

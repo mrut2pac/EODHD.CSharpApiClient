@@ -8,12 +8,12 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the number of shares outstanding, as a count.
         /// </summary>
-        public long? SharesOutstanding { get; set; }
+        public decimal? SharesOutstanding { get; set; }
 
         /// <summary>
         /// Gets or sets the number of shares in the public float, as a count.
         /// </summary>
-        public long? SharesFloat { get; set; }
+        public decimal? SharesFloat { get; set; }
 
         /// <summary>
         /// Gets or sets the percentage of shares held by insiders (percent).

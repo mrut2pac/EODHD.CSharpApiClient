@@ -18,7 +18,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the EBITDA (currency).
         /// </summary>
-        public long? EBITDA { get; set; }
+        public decimal? EBITDA { get; set; }
 
         /// <summary>
         /// Gets or sets the price-to-earnings ratio.
@@ -103,7 +103,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the trailing-twelve-month revenue (currency).
         /// </summary>
-        public long? RevenueTTM { get; set; }
+        public decimal? RevenueTTM { get; set; }
 
         /// <summary>
         /// Gets or sets the trailing-twelve-month revenue per share (currency).
@@ -118,7 +118,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the trailing-twelve-month gross profit (currency).
         /// </summary>
-        public long? GrossProfitTTM { get; set; }
+        public decimal? GrossProfitTTM { get; set; }
 
         /// <summary>
         /// Gets or sets the trailing-twelve-month diluted earnings per share (currency).

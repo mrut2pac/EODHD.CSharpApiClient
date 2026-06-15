@@ -34,6 +34,6 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the number of outstanding shares, as a count.
         /// </summary>
-        public long Shares { get; set; }
+        public decimal? Shares { get; set; }
     }
 }

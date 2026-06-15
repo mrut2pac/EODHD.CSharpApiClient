@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — core market data)
+- Intraday historical prices (`GetIntradayHistoricalStockPrices[Async]`) with a
+  `1m`/`5m`/`1h` interval and a converter for EODHD's space-separated timestamps.
+- Historical dividends (`GetHistoricalDividends[Async]`).
+- Live/delayed real-time quotes — single (`GetLivePrice[Async]`) and multi-symbol
+  (`GetLivePrices[Async]`), with an `"NA"`-tolerant numeric converter.
+- Search (`Search[Async]`), full exchanges list (`GetExchangesList[Async]`), and the
+  IPO calendar (`GetUpcomingIpos[Async]`).
+- Unit tests for the new converters and endpoints; `SkippableFact` integration tests.
+
+### Fixed
+- Widened large financial / share-count fundamentals fields (e.g. `Shares`, `EBITDA`,
+  `RevenueTTM`, `SharesOutstanding`, `EnterpriseValue`, crypto supply) from `long` to
+  `decimal?` — EODHD returns these with decimals / beyond `Int64` range, which threw
+  during deserialization. Surfaced by running the integration suite against live data.
+
 ### Added
 - Initial repository scaffold: solution, package metadata, MIT license, CI + publish
   workflows (NuGet Trusted Publishing / OIDC), and the testing layout.

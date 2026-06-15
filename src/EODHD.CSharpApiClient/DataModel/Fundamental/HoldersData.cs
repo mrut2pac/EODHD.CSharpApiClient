@@ -39,12 +39,12 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the current shares held, as a count.
         /// </summary>
-        public long? CurrentShares { get; set; }
+        public decimal? CurrentShares { get; set; }
 
         /// <summary>
         /// Gets or sets the change in shares, as a count.
         /// </summary>
-        public long? Change { get; set; }
+        public decimal? Change { get; set; }
 
         /// <summary>
         /// Gets or sets the change in shares, as a percent.
