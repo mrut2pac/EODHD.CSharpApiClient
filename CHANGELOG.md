@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — news & events)
+- Financial news (`GetNews[Async]`, by symbol and/or tag, with date range, limit, offset)
+  including the per-article sentiment breakdown.
+- News sentiment (`GetNewsSentiments[Async]`) and social/tweets sentiment
+  (`GetTweetsSentiments[Async]`) — daily aggregated series keyed by symbol.
+- Economic events calendar (`GetEconomicEvents[Async]`) with country/comparison/type
+  filters; event timestamps parsed via the space-separated date converter.
+- Unit tests for all three groups; `SkippableFact` integration tests (verified live).
+
 ### Added (REST coverage — core market data)
 - Intraday historical prices (`GetIntradayHistoricalStockPrices[Async]`) with a
   `1m`/`5m`/`1h` interval and a converter for EODHD's space-separated timestamps.
