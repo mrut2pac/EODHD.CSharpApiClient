@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — options)
+- Legacy options chain (`GetOptionsChain[Async]`) — the nested per-expiration structure with call/put
+  contracts, pricing, and greeks. Timestamp fields that use a zero sentinel
+  (`0000-00-00 00:00:00`) are surfaced as raw strings.
+- Marketplace options API (`GetOptionsEod[Async]`, `GetOptionContracts[Async]`) — end-of-day prices and
+  contract snapshots with the full 43-field attribute set (OHLC, bid/ask, volume, open interest,
+  volatility, and greeks), filtering (type, strike, expiration, trade date), sorting, and pagination.
+  The JSON:API `data[].attributes` envelope is unwrapped to an `OptionData[]`. These endpoints require
+  the separate marketplace options subscription.
+- Unit tests for all three (mapping verified against captured live responses); `SkippableFact`
+  integration tests — the legacy chain runs against the configured key, and the marketplace endpoints
+  are verified live via EODHD's public `demo` token.
+
 ### Added (REST coverage — bonds, insider transactions, earnings trends)
 - Insider transactions (`GetInsiderTransactions[Async]`) — SEC Form 4 records, optionally filtered
   by symbol and date range.

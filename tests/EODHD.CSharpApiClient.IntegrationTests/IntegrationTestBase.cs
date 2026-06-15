@@ -51,6 +51,18 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             return new EodhdClient(new EodhdClientOptions { ApiToken = this.ApiToken });
         }
 
+        /// <summary>
+        /// Creates an <see cref="EodhdClient"/> bound to EODHD's public <c>demo</c> token. Some endpoints
+        /// (e.g. the marketplace options API) require a separate add-on the main key may not carry, but
+        /// the documented <c>demo</c> token serves a fixed set of symbols (notably <c>AAPL</c>) for them,
+        /// so the integration test can still exercise the endpoint live.
+        /// </summary>
+        /// <returns>A new client instance bound to the demo token.</returns>
+        protected static EodhdClient CreateDemoClient()
+        {
+            return new EodhdClient(new EodhdClientOptions { ApiToken = "demo" });
+        }
+
         public void Dispose()
         {
         }
