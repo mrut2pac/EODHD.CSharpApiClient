@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EODHD.CSharpApiClient/EODHD.CSharpApiClient.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EODHD.CSharpApiClient.UnitTests/EODHD.CSharpApiClient.UnitTests.csproj" />
+    <Project Path="tests/EODHD.CSharpApiClient.IntegrationTests/EODHD.CSharpApiClient.IntegrationTests.csproj" />
+  </Folder>
+</Solution>
