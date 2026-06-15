@@ -1,4 +1,7 @@
 using System;
+using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel
 {
@@ -18,8 +21,10 @@ namespace EODHD.CSharpApiClient.DataModel
         public double? GmtOffset { get; set; }
 
         /// <summary>
-        /// Gets or sets the bar date and time.
+        /// Gets or sets the bar date and time (UTC). EODHD sends this as a space-separated
+        /// <c>"yyyy-MM-dd HH:mm:ss"</c> string, parsed via <see cref="SpaceSeparatedDateTimeConverter"/>.
         /// </summary>
+        [JsonConverter(typeof(SpaceSeparatedDateTimeConverter))]
         public DateTime? DateTime { get; set; }
 
         /// <summary>
