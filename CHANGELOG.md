@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Packaging
+- Ship a symbol package (`.snupkg`) with Source Link (`Microsoft.SourceLink.GitHub`) and a
+  deterministic build, so consumers can step into the client source while debugging. Source
+  Link is a build-time-only dependency — the package keeps zero runtime dependencies.
+
 ### Added (REST coverage — technical indicators)
 - Technical indicators (`GetTechnicalIndicator[Async]`) covering all ~20 functions via a
   `TechnicalFunction` enum and an `extraParameters` escape hatch for function-specific
