@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — bonds, insider transactions, earnings trends)
+- Insider transactions (`GetInsiderTransactions[Async]`) — SEC Form 4 records, optionally filtered
+  by symbol and date range.
+- Bond fundamentals (`GetBondFundamentals[Async]`) by ISIN, including the nested
+  `ClassificationData` and `IssueData` blocks.
+- Earnings trends (`GetEarningsTrends[Async]`) — analyst estimates, EPS trend, and revisions; the
+  API's per-symbol nested arrays are flattened into a single `EarningsTrend[]`.
+- Unit tests for all three groups; `SkippableFact` integration tests (verified live).
+
 ### Added (REST coverage — screener, macro, market cap)
 - Stock-market screener (`GetScreener[Async]`) with strongly-typed `ScreenerFilter` conditions
   (serialized to EODHD's `[field, operation, value]` triples), pre-defined `signals`, `sort`,

@@ -11,10 +11,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.DataModel;
+using EODHD.CSharpApiClient.DataModel.Bonds;
 using EODHD.CSharpApiClient.DataModel.BulkFundamental;
+using EODHD.CSharpApiClient.DataModel.EarningsTrends;
 using EODHD.CSharpApiClient.DataModel.EconomicEvents;
 using EODHD.CSharpApiClient.DataModel.ExchangeInfo;
 using EODHD.CSharpApiClient.DataModel.Fundamental;
+using EODHD.CSharpApiClient.DataModel.InsiderTransactions;
 using EODHD.CSharpApiClient.DataModel.Macro;
 using EODHD.CSharpApiClient.DataModel.MarketCap;
 using EODHD.CSharpApiClient.DataModel.News;
@@ -1136,6 +1139,126 @@ namespace EODHD.CSharpApiClient
         public HistoricalMarketCap[] GetHistoricalMarketCap(string symbol, DateTime? from = null, DateTime? to = null)
         {
             return this.GetHistoricalMarketCapAsync(symbol, from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Insider Transactions API
+        // ================================================================
+
+        /// <summary>
+        /// Returns insider (SEC Form 4) transactions, optionally filtered by symbol and date range.
+        /// </summary>
+        /// <param name="symbol">Optional ticker to filter to (e.g. <c>"AAPL.US"</c>); <c>null</c> returns all symbols.</param>
+        /// <param name="from">Optional inclusive start date (default: one year ago).</param>
+        /// <param name="to">Optional inclusive end date (default: today).</param>
+        /// <param name="limit">Optional number of entries (1–1000, default 100).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The insider transactions.</returns>
+        public Task<InsiderTransaction[]> GetInsiderTransactionsAsync(string symbol = null, DateTime? from = null, DateTime? to = null, int? limit = null, CancellationToken ct = default)
+        {
+            return this.GetJsonAsync<InsiderTransaction[]>(
+                "insider-transactions",
+                ct,
+                ("code", symbol),
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to)),
+                ("limit", FormatInt(limit)));
+        }
+
+        /// <summary>
+        /// Returns insider (SEC Form 4) transactions, optionally filtered by symbol and date range.
+        /// </summary>
+        /// <param name="symbol">Optional ticker to filter to (e.g. <c>"AAPL.US"</c>); <c>null</c> returns all symbols.</param>
+        /// <param name="from">Optional inclusive start date (default: one year ago).</param>
+        /// <param name="to">Optional inclusive end date (default: today).</param>
+        /// <param name="limit">Optional number of entries (1–1000, default 100).</param>
+        /// <returns>The insider transactions.</returns>
+        public InsiderTransaction[] GetInsiderTransactions(string symbol = null, DateTime? from = null, DateTime? to = null, int? limit = null)
+        {
+            return this.GetInsiderTransactionsAsync(symbol, from, to, limit).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Bond Fundamentals API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the fundamentals for a single bond, identified by ISIN.
+        /// </summary>
+        /// <param name="isin">The bond ISIN (e.g. <c>"DE000CB83CF0"</c>).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The bond fundamentals.</returns>
+        public Task<BondFundamentals> GetBondFundamentalsAsync(string isin, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(isin))
+            {
+                throw new ArgumentNullException(nameof(isin));
+            }
+
+            return this.GetJsonAsync<BondFundamentals>("bond-fundamentals/" + Uri.EscapeDataString(isin), ct);
+        }
+
+        /// <summary>
+        /// Returns the fundamentals for a single bond, identified by ISIN.
+        /// </summary>
+        /// <param name="isin">The bond ISIN (e.g. <c>"DE000CB83CF0"</c>).</param>
+        /// <returns>The bond fundamentals.</returns>
+        public BondFundamentals GetBondFundamentals(string isin)
+        {
+            return this.GetBondFundamentalsAsync(isin).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Earnings Trends API
+        // ================================================================
+
+        /// <summary>
+        /// Returns earnings-trend records (analyst estimates, EPS trend, and revisions) for one or more
+        /// symbols. The API nests one record set per symbol; the results are flattened into a single
+        /// array (each record carries its own <see cref="EarningsTrend.Code"/>).
+        /// </summary>
+        /// <param name="symbols">The symbols to fetch trends for (e.g. <c>"AAPL.US"</c>, <c>"MSFT.US"</c>).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The earnings-trend records across all requested symbols.</returns>
+        public async Task<EarningsTrend[]> GetEarningsTrendsAsync(IReadOnlyList<string> symbols, CancellationToken ct = default)
+        {
+            if(symbols == null || symbols.Count == 0)
+            {
+                throw new ArgumentException("At least one symbol must be supplied.", nameof(symbols));
+            }
+
+            EarningsTrendsResponse response = await this.GetJsonAsync<EarningsTrendsResponse>(
+                "calendar/trends",
+                ct,
+                ("symbols", JoinSymbols(symbols))).ConfigureAwait(false);
+
+            if(response?.Trends == null)
+            {
+                return Array.Empty<EarningsTrend>();
+            }
+
+            List<EarningsTrend> flattened = new List<EarningsTrend>();
+            foreach(EarningsTrend[] perSymbol in response.Trends)
+            {
+                if(perSymbol != null)
+                {
+                    flattened.AddRange(perSymbol);
+                }
+            }
+
+            return flattened.ToArray();
+        }
+
+        /// <summary>
+        /// Returns earnings-trend records (analyst estimates, EPS trend, and revisions) for one or more
+        /// symbols, flattened into a single array (each record carries its own
+        /// <see cref="EarningsTrend.Code"/>).
+        /// </summary>
+        /// <param name="symbols">The symbols to fetch trends for (e.g. <c>"AAPL.US"</c>, <c>"MSFT.US"</c>).</param>
+        /// <returns>The earnings-trend records across all requested symbols.</returns>
+        public EarningsTrend[] GetEarningsTrends(IReadOnlyList<string> symbols)
+        {
+            return this.GetEarningsTrendsAsync(symbols).GetAwaiter().GetResult();
         }
 
         /// <summary>
