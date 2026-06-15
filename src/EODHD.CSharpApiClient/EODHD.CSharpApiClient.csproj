@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>EODHD.CSharpApiClient</RootNamespace>
+    <AssemblyName>EODHD.CSharpApiClient</AssemblyName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+
+    <!-- NuGet packaging -->
+    <IsPackable>true</IsPackable>
+    <PackageId>EODHD.CSharpApiClient</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Vardan Tovmasyan</Authors>
+    <Description>Pure-managed, async-first C# client for the EOD Historical Data (EODHD) API. REST coverage for end-of-day and intraday prices, fundamentals, dividends and splits, exchanges, and the calendar — plus the Live (WebSocket) API. Zero runtime dependencies — works on any .NET 8+ runtime.</Description>
+    <PackageTags>eodhd;eod-historical-data;market-data;trading;stocks;fundamentals;historical;api-client</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/mrut2pac/EODHD.CSharpApiClient</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mrut2pac/EODHD.CSharpApiClient</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>
+v0.1.0 — pre-release scaffold. Async-first client foundation with an IHttpTransport seam,
+typed EodhdHttpException, and the first endpoint (User API). REST and Live/WebSocket coverage
+is being built out toward v1.0.0.
+
+Full history: https://github.com/mrut2pac/EODHD.CSharpApiClient/blob/main/CHANGELOG.md
+    </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Condition="Exists('..\..\README.md')" />
+  </ItemGroup>
+
+</Project>
