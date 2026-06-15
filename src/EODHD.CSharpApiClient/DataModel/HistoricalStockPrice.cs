@@ -58,15 +58,16 @@ namespace EODHD.CSharpApiClient.DataModel
         public double AdjustedOpen => Math.Round(this.AdjustmentCoeficient * this.Open, 4);
 
         /// <summary>
-        /// Gets or sets the traded volume.
+        /// Gets or sets the traded volume. Typed as <see cref="decimal"/> because high-volume penny
+        /// stocks can exceed the range of <see cref="long"/>.
         /// </summary>
-        public long Volume { get; set; }
+        public decimal? Volume { get; set; }
 
         /// <summary>
-        /// Gets the adjusted volume.
+        /// Gets the adjusted volume, or <c>null</c> when volume is unavailable.
         /// </summary>
         [JsonIgnore]
-        public double AdjustedVolume => this.Volume / this.AdjustmentCoeficient;
+        public double? AdjustedVolume => this.Volume.HasValue ? (double)this.Volume.Value / this.AdjustmentCoeficient : (double?)null;
 
         /// <summary>
         /// Gets the ratio of adjusted close to close used to derive the other adjusted values.

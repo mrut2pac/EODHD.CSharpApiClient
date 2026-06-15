@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — technical indicators)
+- Technical indicators (`GetTechnicalIndicator[Async]`) covering all ~20 functions via a
+  `TechnicalFunction` enum and an `extraParameters` escape hatch for function-specific
+  parameters. Each point exposes its outputs in a `Values` dictionary keyed by the API's
+  field names (function-agnostic), so single-valued, multi-valued (MACD, Bollinger,
+  stochastic), and OHLC (split-adjusted) shapes all work; `TechnicalIndicatorPointConverter`
+  handles deserialization.
+
+### Fixed
+- Widened EOD `Volume` (single-symbol and bulk) from `long` to `decimal?` — high-volume
+  penny stocks exceed `Int64`, which threw mid-array during bulk deserialization. Surfaced
+  by the live integration suite.
+
 ### Added (REST coverage — news & events)
 - Financial news (`GetNews[Async]`, by symbol and/or tag, with date range, limit, offset)
   including the per-article sentiment breakdown.
