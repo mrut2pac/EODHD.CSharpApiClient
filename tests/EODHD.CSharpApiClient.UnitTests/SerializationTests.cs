@@ -34,7 +34,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(new DateTime(2024, 1, 2), bar.Date);
             Assert.Equal(187.0, bar.Open);
             Assert.Equal(184.20, bar.AdjustedClose);
-            Assert.Equal(82488700L, bar.Volume);
+            Assert.Equal(82488700m, bar.Volume);
 
             // AdjustedLow = round(adjusted_close/close * low, 4)
             double expectedAdjustedLow = Math.Round(184.20 / 185.64 * 183.89, 4);
