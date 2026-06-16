@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (live streaming — WebSocket: forex & crypto)
+- `EodhdWebSocketClient<TMessage>` — a streaming client for the EODHD live (WebSocket) feeds, created via
+  `EodhdWebSocketClient.Forex(...)` and `EodhdWebSocketClient.Crypto(...)`. Messages are delivered as an
+  `IAsyncEnumerable<T>` (`ReadMessagesAsync`); `SubscribeAsync`/`UnsubscribeAsync` adjust the symbol set
+  (max 50) on the fly. The connection auto-reconnects with exponential backoff and replays subscriptions
+  (configurable via `EodhdWebSocketOptions`). Built on `System.Net.WebSockets` — no new dependency — behind
+  an `IWebSocketConnection` seam for testing.
+- Typed messages `ForexQuote` (bid/ask) and `CryptoTrade` (price/quantity).
+- Unit tests (mock connection: parsing, control-message skipping, subscribe payloads, reconnect/resubscribe,
+  validation); `SkippableFact` integration tests streaming live forex and crypto.
+- The `us` and `us-quote` feeds are entitled too but only stream during US market hours; they will be added
+  once their message shapes can be captured live.
+
 ### Added (REST coverage — tick data)
 - Historical trade-level tick data for US equities (`GetTicks[Async]`). The API returns the ticks as
   parallel columns (struct-of-arrays); the client transposes them into one `Tick` per trade (exchange,
