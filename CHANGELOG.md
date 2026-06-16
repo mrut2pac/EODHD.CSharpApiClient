@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — commodities, ID mapping, US delayed quotes, option underlyings)
+- Historical commodity prices (`GetCommodityHistoricalPrices[Async]`) by commodity code
+  (e.g. `BRENT`, `WTI`, `GOLD`).
+- Identifier mapping (`GetIdMapping[Async]`) between symbol, ISIN, FIGI, LEI, CUSIP, and CIK
+  (at least one filter required).
+- US delayed quotes (`GetUsDelayedQuotes[Async]`) — a wide reference + quote + statistics record per
+  symbol, returned keyed by symbol.
+- Marketplace option underlying-symbols (`GetOptionUnderlyingSymbols[Async]`) — the compact list of
+  symbols that have options (requires the marketplace options subscription).
+- Unit tests for all groups; `SkippableFact` integration tests (verified live; option underlyings via
+  the public `demo` token).
+
 ### Added (REST coverage — upcoming dividends, US Treasury rates)
 - Upcoming-dividends calendar (`GetUpcomingDividends[Async]`) — ex-dividend dates, filtered by symbol
   and/or date (the API requires at least one of symbol or an exact date).

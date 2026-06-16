@@ -13,15 +13,18 @@ using System.Threading.Tasks;
 using EODHD.CSharpApiClient.DataModel;
 using EODHD.CSharpApiClient.DataModel.Bonds;
 using EODHD.CSharpApiClient.DataModel.BulkFundamental;
+using EODHD.CSharpApiClient.DataModel.Commodities;
 using EODHD.CSharpApiClient.DataModel.EarningsTrends;
 using EODHD.CSharpApiClient.DataModel.EconomicEvents;
 using EODHD.CSharpApiClient.DataModel.ExchangeInfo;
 using EODHD.CSharpApiClient.DataModel.Fundamental;
+using EODHD.CSharpApiClient.DataModel.IdMappings;
 using EODHD.CSharpApiClient.DataModel.InsiderTransactions;
 using EODHD.CSharpApiClient.DataModel.Macro;
 using EODHD.CSharpApiClient.DataModel.MarketCap;
 using EODHD.CSharpApiClient.DataModel.News;
 using EODHD.CSharpApiClient.DataModel.Options;
+using EODHD.CSharpApiClient.DataModel.Quotes;
 using EODHD.CSharpApiClient.DataModel.Screener;
 using EODHD.CSharpApiClient.DataModel.Sentiment;
 using EODHD.CSharpApiClient.DataModel.TechnicalIndicators;
@@ -1549,6 +1552,178 @@ namespace EODHD.CSharpApiClient
         public TreasuryLongTermRate[] GetTreasuryLongTermRates(int? year = null, int? offset = null, int? limit = null)
         {
             return this.GetTreasuryLongTermRatesAsync(year, offset, limit).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Commodities API
+        // ================================================================
+
+        /// <summary>
+        /// Returns historical prices for a commodity.
+        /// </summary>
+        /// <param name="code">The commodity code (e.g. <c>"BRENT"</c>, <c>"WTI"</c>, <c>"GOLD"</c>, <c>"NATURAL_GAS"</c>).</param>
+        /// <param name="interval">Optional aggregation interval (e.g. <c>"monthly"</c>, <c>"daily"</c>).</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The historical commodity prices.</returns>
+        public async Task<CommodityPrice[]> GetCommodityHistoricalPricesAsync(string code, string interval = null, DateTime? from = null, DateTime? to = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(code))
+            {
+                throw new ArgumentNullException(nameof(code));
+            }
+
+            DataEnvelope<CommodityPrice> response = await this.GetJsonAsync<DataEnvelope<CommodityPrice>>(
+                "commodities/historical/" + Uri.EscapeDataString(code),
+                ct,
+                ("interval", interval),
+                ("from", FormatDate(from)),
+                ("to", FormatDate(to))).ConfigureAwait(false);
+
+            return response?.Data ?? Array.Empty<CommodityPrice>();
+        }
+
+        /// <summary>
+        /// Returns historical prices for a commodity.
+        /// </summary>
+        /// <param name="code">The commodity code (e.g. <c>"BRENT"</c>, <c>"WTI"</c>, <c>"GOLD"</c>, <c>"NATURAL_GAS"</c>).</param>
+        /// <param name="interval">Optional aggregation interval (e.g. <c>"monthly"</c>, <c>"daily"</c>).</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <returns>The historical commodity prices.</returns>
+        public CommodityPrice[] GetCommodityHistoricalPrices(string code, string interval = null, DateTime? from = null, DateTime? to = null)
+        {
+            return this.GetCommodityHistoricalPricesAsync(code, interval, from, to).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // ID Mapping API
+        // ================================================================
+
+        /// <summary>
+        /// Maps between financial identifiers. At least one filter must be supplied.
+        /// </summary>
+        /// <param name="symbol">Optional EODHD symbol filter (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="exchange">Optional exchange-code filter.</param>
+        /// <param name="isin">Optional ISIN filter.</param>
+        /// <param name="figi">Optional FIGI filter.</param>
+        /// <param name="lei">Optional LEI filter.</param>
+        /// <param name="cusip">Optional CUSIP filter.</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The matching identifier mappings.</returns>
+        public async Task<IdMapping[]> GetIdMappingAsync(string symbol = null, string exchange = null, string isin = null, string figi = null, string lei = null, string cusip = null, int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol) && string.IsNullOrWhiteSpace(exchange) && string.IsNullOrWhiteSpace(isin)
+                && string.IsNullOrWhiteSpace(figi) && string.IsNullOrWhiteSpace(lei) && string.IsNullOrWhiteSpace(cusip))
+            {
+                throw new ArgumentException("At least one identifier filter must be supplied.", nameof(symbol));
+            }
+
+            DataEnvelope<IdMapping> response = await this.GetJsonAsync<DataEnvelope<IdMapping>>(
+                "id-mapping",
+                ct,
+                ("filter[symbol]", symbol),
+                ("filter[ex]", exchange),
+                ("filter[isin]", isin),
+                ("filter[figi]", figi),
+                ("filter[lei]", lei),
+                ("filter[cusip]", cusip),
+                ("page[offset]", FormatInt(offset)),
+                ("page[limit]", FormatInt(limit))).ConfigureAwait(false);
+
+            return response?.Data ?? Array.Empty<IdMapping>();
+        }
+
+        /// <summary>
+        /// Maps between financial identifiers. At least one filter must be supplied.
+        /// </summary>
+        /// <param name="symbol">Optional EODHD symbol filter (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="exchange">Optional exchange-code filter.</param>
+        /// <param name="isin">Optional ISIN filter.</param>
+        /// <param name="figi">Optional FIGI filter.</param>
+        /// <param name="lei">Optional LEI filter.</param>
+        /// <param name="cusip">Optional CUSIP filter.</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The matching identifier mappings.</returns>
+        public IdMapping[] GetIdMapping(string symbol = null, string exchange = null, string isin = null, string figi = null, string lei = null, string cusip = null, int? offset = null, int? limit = null)
+        {
+            return this.GetIdMappingAsync(symbol, exchange, isin, figi, lei, cusip, offset, limit).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // US Delayed Quote API
+        // ================================================================
+
+        /// <summary>
+        /// Returns delayed US stock quotes for one or more symbols, keyed by symbol code.
+        /// </summary>
+        /// <param name="symbols">The symbols to quote (e.g. <c>"AAPL"</c>, <c>"MSFT"</c>).</param>
+        /// <param name="fields">Optional comma-separated list of fields to restrict the response to.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A dictionary of quotes keyed by symbol code.</returns>
+        public async Task<Dictionary<string, UsDelayedQuote>> GetUsDelayedQuotesAsync(IReadOnlyList<string> symbols, string fields = null, CancellationToken ct = default)
+        {
+            if(symbols == null || symbols.Count == 0)
+            {
+                throw new ArgumentException("At least one symbol must be supplied.", nameof(symbols));
+            }
+
+            UsQuoteResponse response = await this.GetJsonAsync<UsQuoteResponse>(
+                "us-quote-delayed",
+                ct,
+                ("s", JoinSymbols(symbols)),
+                ("fields", fields)).ConfigureAwait(false);
+
+            return response?.Data ?? new Dictionary<string, UsDelayedQuote>();
+        }
+
+        /// <summary>
+        /// Returns delayed US stock quotes for one or more symbols, keyed by symbol code.
+        /// </summary>
+        /// <param name="symbols">The symbols to quote (e.g. <c>"AAPL"</c>, <c>"MSFT"</c>).</param>
+        /// <param name="fields">Optional comma-separated list of fields to restrict the response to.</param>
+        /// <returns>A dictionary of quotes keyed by symbol code.</returns>
+        public Dictionary<string, UsDelayedQuote> GetUsDelayedQuotes(IReadOnlyList<string> symbols, string fields = null)
+        {
+            return this.GetUsDelayedQuotesAsync(symbols, fields).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // Options — Underlying Symbols (marketplace)
+        // ================================================================
+
+        /// <summary>
+        /// Returns the list of underlying symbols that have options, from the marketplace options API.
+        /// This endpoint requires the separate marketplace options subscription.
+        /// </summary>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The underlying symbols.</returns>
+        public async Task<string[]> GetOptionUnderlyingSymbolsAsync(int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            DataEnvelope<string> response = await this.GetJsonAsync<DataEnvelope<string>>(
+                "mp/unicornbay/options/underlying-symbols",
+                ct,
+                ("page[offset]", FormatInt(offset)),
+                ("page[limit]", FormatInt(limit))).ConfigureAwait(false);
+
+            return response?.Data ?? Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// Returns the list of underlying symbols that have options, from the marketplace options API.
+        /// </summary>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The underlying symbols.</returns>
+        public string[] GetOptionUnderlyingSymbols(int? offset = null, int? limit = null)
+        {
+            return this.GetOptionUnderlyingSymbolsAsync(offset, limit).GetAwaiter().GetResult();
         }
 
         /// <summary>
