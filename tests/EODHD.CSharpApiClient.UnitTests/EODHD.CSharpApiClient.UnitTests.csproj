@@ -7,8 +7,11 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <!-- Test method names use underscores (Method_Scenario_Expectation); array args are inline by design. -->
-    <NoWarn>$(NoWarn);CA1707;CA1861</NoWarn>
+    <!-- Required for IDE0005 (unused usings) to be reported at build time, not just by dotnet format. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Test method names use underscores (Method_Scenario_Expectation); array args are inline by design;
+         CS1591 (missing XML doc) is irrelevant for test code. -->
+    <NoWarn>$(NoWarn);CA1707;CA1861;CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
