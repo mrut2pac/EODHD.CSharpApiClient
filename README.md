@@ -1,5 +1,8 @@
 # EODHD.CSharpApiClient
 
+[![NuGet](https://img.shields.io/nuget/v/EODHD.CSharpApiClient.svg)](https://www.nuget.org/packages/EODHD.CSharpApiClient)
+[![EODHD](https://img.shields.io/badge/EODHD-Financial%20APIs-5B6CF0)](https://eodhd.com/financial-apis)
+
 Pure-managed C# client for the [EOD Historical Data (EODHD)](https://eodhd.com/financial-apis) API — full REST coverage plus live (WebSocket) streaming.
 
 - **Async-first** — every endpoint is `Task`-returning with an optional `CancellationToken`; synchronous convenience wrappers are provided alongside.
