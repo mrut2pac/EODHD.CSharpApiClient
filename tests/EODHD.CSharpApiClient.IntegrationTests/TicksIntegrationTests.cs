@@ -34,6 +34,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             Assert.NotNull(ticks);
             Skip.If(ticks.Length == 0, "No ticks returned for the window.");
             Assert.All(ticks, t => Assert.True(t.TimestampMs.HasValue));
+            Assert.All(ticks, t => Assert.Equal(t.TimestampMs.HasValue, t.TimestampUtc.HasValue));
             Assert.Contains(ticks, t => t.Price.HasValue);
         }
     }

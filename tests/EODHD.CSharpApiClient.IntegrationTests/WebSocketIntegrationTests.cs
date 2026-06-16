@@ -24,6 +24,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             Assert.Equal("EURUSD", first.Symbol);
             Assert.True(first.Ask.HasValue || first.Bid.HasValue);
             Assert.True(first.TimestampMs.HasValue);
+            Assert.True(first.TimestampUtc.HasValue);
         }
 
         [SkippableFact]
@@ -38,6 +39,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             Assert.Equal("BTC-USD", first.Symbol);
             Assert.True(first.Price.HasValue);
             Assert.True(first.TimestampMs.HasValue);
+            Assert.True(first.TimestampUtc.HasValue);
         }
 
         [SkippableFact]
@@ -51,6 +53,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             Skip.If(first == null, "No live US trade received (US market likely closed — streams during regular and extended hours only).");
             Assert.False(string.IsNullOrEmpty(first.Symbol));
             Assert.True(first.TimestampMs.HasValue);
+            Assert.True(first.TimestampUtc.HasValue);
         }
 
         [SkippableFact]

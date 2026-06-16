@@ -50,6 +50,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             LiveStockPrice quote = await client.GetLivePriceAsync("AAPL.US");
 
             Assert.Equal("AAPL.US", quote.Code);
+            Assert.Equal(1640984100L, quote.TimestampSec);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1640984100L), quote.TimestampUtc);
             Assert.Null(quote.Close);
             Assert.Null(quote.Volume);
             Assert.Null(quote.ChangePercent);

@@ -127,6 +127,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(2, trades.Count);
             Assert.Equal(66408.48, trades[0].Price);
             Assert.Equal(66410.10, trades[1].Price);
+            Assert.Equal(1781593338284, trades[0].TimestampMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781593338284), trades[0].TimestampUtc);
             // The reconnect replayed the subscription on the second connection.
             Assert.Contains("{\"action\":\"subscribe\",\"symbols\":\"BTC-USD\"}", second.Sent);
         }
@@ -165,6 +167,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.False(trades[0].DarkPool);
             Assert.Equal("extended-hours", trades[0].MarketStatus);
             Assert.Equal(1781596800421, trades[0].TimestampMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781596800421), trades[0].TimestampUtc);
         }
 
         [Fact]
@@ -184,6 +187,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(405.05, quotes[0].BidPrice);
             Assert.Equal(40, quotes[0].BidSize);
             Assert.Equal(1781596800421, quotes[0].TimestampMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781596800421), quotes[0].TimestampUtc);
         }
 
         [Fact]
