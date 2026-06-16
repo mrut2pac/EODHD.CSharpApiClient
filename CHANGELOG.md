@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — tick data)
+- Historical trade-level tick data for US equities (`GetTicks[Async]`). The API returns the ticks as
+  parallel columns (struct-of-arrays); the client transposes them into one `Tick` per trade (exchange,
+  market, sub-market, price, sequence, shares, sales condition, and millisecond timestamp). Filterable by
+  `from`/`to` (sent as Unix timestamps) and `limit`. Tolerates absent columns (e.g. `ex`).
+- Unit tests (transpose, missing-column tolerance, Unix-timestamp parameters); `SkippableFact` integration
+  test (verified live).
+
 ### Added (REST coverage — ticker logos)
 - Ticker logos (`GetLogoUrl[Async]`, `GetLogoBytes[Async]`, `DownloadLogoBytes[Async]`). Because the logo
   path is not predictably derivable from the symbol (its casing varies by exchange), the URL is resolved
