@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — Cboe indices, news word weights)
+- Cboe index list (`GetCboeIndices[Async]`) — the available index snapshots (index-level fields).
+- Cboe single index (`GetCboeIndex[Async]`) — a single index snapshot with its constituent
+  components, addressed by index code, feed type, and date (all required by the API). The JSON:API
+  `data[].attributes` envelope and the nested `components[].attributes` are flattened onto a
+  `CboeIndex` with a `CboeIndexComponent[]`. These endpoints require the Cboe marketplace subscription.
+- News word weights (`GetNewsWordWeights[Async]`) — the weighted keywords extracted from recent news
+  for a symbol, returned as a word-to-weight dictionary.
+- Unit tests for all groups; `SkippableFact` integration tests (verified live; the Cboe endpoints are
+  gated on the marketplace entitlement).
+
 ### Added (REST coverage — commodities, ID mapping, US delayed quotes, option underlyings)
 - Historical commodity prices (`GetCommodityHistoricalPrices[Async]`) by commodity code
   (e.g. `BRENT`, `WTI`, `GOLD`).
