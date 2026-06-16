@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-16
+
 ### Changed (explicit epoch units + UTC accessors)
 - Renamed every raw Unix-epoch field to carry its unit: millisecond fields are now `…Ms`
   (`TimestampMs`, `BidTimeMs`, `AskTimeMs`, `LastTradeTimeMs`, `EthTimeMs`) and second fields are now
@@ -180,4 +182,5 @@ All notable changes to this project are documented here. The format is based on
   split-factor parsing, the rate limiter, and error paths. Integration tests
   (`SkippableFact`, gated on `EODHD_API_KEY`) covering every ported endpoint.
 
-[Unreleased]: https://github.com/mrut2pac/EODHD.CSharpApiClient/commits/main
+[Unreleased]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.0...main
+[1.0.0]: https://github.com/mrut2pac/EODHD.CSharpApiClient/tree/v1.0.0
