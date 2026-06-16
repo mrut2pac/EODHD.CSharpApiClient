@@ -148,7 +148,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 data = await client.GetFundamentalsDataAsync("AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -172,7 +172,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 data = await client.GetFundamentalsDataAsync("LEH.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -194,7 +194,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 data = await client.GetBulkFundamentalsDataAsync("US", symbols: BulkSymbols);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -215,7 +215,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 data = await client.GetBulkFundamentalsExtendedDataAsync("US", symbols: BulkSymbols);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

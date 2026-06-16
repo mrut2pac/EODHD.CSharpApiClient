@@ -26,7 +26,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
                     sort: "market_capitalization.desc",
                     limit: 5);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -48,7 +48,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 values = await client.GetMacroIndicatorAsync("USA", MacroIndicator.InflationConsumerPricesAnnual);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -70,7 +70,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 values = await client.GetMacroIndicatorAsync("USA");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -91,7 +91,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 caps = await client.GetHistoricalMarketCapAsync("AAPL.US", new DateTime(2024, 1, 1), new DateTime(2024, 12, 31));
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

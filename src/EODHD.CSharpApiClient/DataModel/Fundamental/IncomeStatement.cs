@@ -28,7 +28,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the most recent quarterly income statement.
         /// </summary>
         [JsonPropertyName("Quarterly_last_0")]
-        public IncomeStatementData Quarterly_last_0 { get; set; }
+        public IncomeStatementData QuarterlyLast0 { get; set; }
 
         /// <summary>
         /// Gets or sets the income statement for the quarter one period back.

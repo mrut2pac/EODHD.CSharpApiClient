@@ -13,7 +13,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the category average, as a percent.
         /// </summary>
-        public double? Category_Average { get; set; }
+        public double? CategoryAverage { get; set; }
 
         /// <summary>
         /// Gets or sets the benchmark value, as a percent.

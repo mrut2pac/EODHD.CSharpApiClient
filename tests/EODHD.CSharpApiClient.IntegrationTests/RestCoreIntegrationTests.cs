@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.DataModel;
@@ -24,7 +23,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 bars = await client.GetIntradayHistoricalStockPricesAsync("AAPL.US", IntradayInterval.FiveMinutes);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -46,7 +45,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 dividends = await client.GetHistoricalDividendsAsync("AAPL.US", new DateTime(2015, 1, 1), new DateTime(2024, 1, 1));
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -92,7 +91,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 results = await client.SearchAsync("apple", limit: 10);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -126,7 +125,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 ipos = await client.GetUpcomingIposAsync(new DateTime(2024, 1, 1), new DateTime(2024, 3, 31));
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

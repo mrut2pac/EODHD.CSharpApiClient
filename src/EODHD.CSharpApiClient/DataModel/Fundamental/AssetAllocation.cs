@@ -35,7 +35,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the category average allocation (percent).
         /// </summary>
         [JsonPropertyName("Category_Average")]
-        public string Category_Average { get; set; }
+        public string CategoryAverage { get; set; }
 
         /// <summary>
         /// Gets or sets the benchmark allocation (percent).

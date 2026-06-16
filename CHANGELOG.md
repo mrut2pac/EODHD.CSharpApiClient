@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — ticker logos)
+- Ticker logos (`GetLogoUrl[Async]`, `GetLogoBytes[Async]`, `DownloadLogoBytes[Async]`). Because the logo
+  path is not predictably derivable from the symbol (its casing varies by exchange), the URL is resolved
+  from fundamentals `General.LogoURL`; `GetLogoUrl` returns `null` when a symbol has no logo. The images
+  are public PNGs served from the site root, fetched through a new raw-bytes transport path;
+  `DownloadLogoBytes` takes a logo URL (absolute or site-relative) so a URL already held on a
+  `FundamentalData` record can be fetched without a second fundamentals call.
+- Unit tests (sequenced mock transport covering the two-step flow); `SkippableFact` integration tests
+  (verified live, including the no-logo case).
+
 ### Added (REST coverage — Cboe indices, news word weights)
 - Cboe index list (`GetCboeIndices[Async]`) — the available index snapshots (index-level fields).
 - Cboe single index (`GetCboeIndex[Async]`) — a single index snapshot with its constituent

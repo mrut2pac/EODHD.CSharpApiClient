@@ -12,7 +12,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// Gets or sets the reporting currency symbol.
         /// </summary>
         [JsonPropertyName("currency_symbol")]
-        public string Currency_symbol { get; set; }
+        public string CurrencySymbol { get; set; }
 
         /// <summary>
         /// Gets or sets the most recent quarterly income-statement snapshot.

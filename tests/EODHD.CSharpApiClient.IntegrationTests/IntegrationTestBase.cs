@@ -13,7 +13,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
     /// </summary>
     public abstract class IntegrationTestBase : IDisposable
     {
-        protected readonly string ApiToken;
+        protected string ApiToken { get; }
 
         protected IntegrationTestBase()
         {

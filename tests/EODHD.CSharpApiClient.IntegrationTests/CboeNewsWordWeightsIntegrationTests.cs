@@ -23,7 +23,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 indices = await client.GetCboeIndicesAsync(limit: 5);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -45,7 +45,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 indices = await client.GetCboeIndicesAsync(limit: 1);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -75,7 +75,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 weights = await client.GetNewsWordWeightsAsync("AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

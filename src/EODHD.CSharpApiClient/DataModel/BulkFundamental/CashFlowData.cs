@@ -15,7 +15,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the filing date (ISO date).
         /// </summary>
-        public string Filing_date { get; set; }
+        public string FilingDate { get; set; }
 
         /// <summary>
         /// Gets or sets the reporting currency symbol.

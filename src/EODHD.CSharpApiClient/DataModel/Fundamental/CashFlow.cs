@@ -28,7 +28,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the most recent quarterly cash-flow data.
         /// </summary>
         [JsonPropertyName("Quarterly_last_0")]
-        public CashFlowData Quarterly_last_0 { get; set; }
+        public CashFlowData QuarterlyLast0 { get; set; }
 
         /// <summary>
         /// Gets or sets the quarterly cash-flow data one quarter back.
