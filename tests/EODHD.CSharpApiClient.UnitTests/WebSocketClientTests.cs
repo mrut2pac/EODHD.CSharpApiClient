@@ -147,6 +147,45 @@ namespace EODHD.CSharpApiClient.UnitTests
         }
 
         [Fact]
+        public async Task ReadMessages_ParsesUsTrade_WithConditionCodes()
+        {
+            FakeConnection connection = new FakeConnection(
+                "{\"s\":\"TSLA\",\"p\":405.3462,\"c\":[14,37,41],\"v\":7,\"dp\":false,\"ms\":\"extended-hours\",\"t\":1781596800421}");
+            using EodhdWebSocketClient<UsTrade> client = new EodhdWebSocketClient<UsTrade>(
+                "test", "us", NoReconnect(), () => connection);
+
+            List<UsTrade> trades = await DrainAsync(client, new[] { "TSLA" });
+
+            Assert.Single(trades);
+            Assert.Equal("TSLA", trades[0].Symbol);
+            Assert.Equal(405.3462, trades[0].Price);
+            Assert.Equal(new[] { 14, 37, 41 }, trades[0].Conditions);
+            Assert.Equal(7, trades[0].Volume);
+            Assert.False(trades[0].DarkPool);
+            Assert.Equal("extended-hours", trades[0].MarketStatus);
+            Assert.Equal(1781596800421, trades[0].Timestamp);
+        }
+
+        [Fact]
+        public async Task ReadMessages_ParsesUsQuote_TopOfBook()
+        {
+            FakeConnection connection = new FakeConnection(
+                "{\"s\":\"TSLA\",\"ap\":405.8,\"as\":200,\"bp\":405.05,\"bs\":40,\"t\":1781596800421}");
+            using EodhdWebSocketClient<UsQuote> client = new EodhdWebSocketClient<UsQuote>(
+                "test", "us-quote", NoReconnect(), () => connection);
+
+            List<UsQuote> quotes = await DrainAsync(client, new[] { "TSLA" });
+
+            Assert.Single(quotes);
+            Assert.Equal("TSLA", quotes[0].Symbol);
+            Assert.Equal(405.8, quotes[0].AskPrice);
+            Assert.Equal(200, quotes[0].AskSize);
+            Assert.Equal(405.05, quotes[0].BidPrice);
+            Assert.Equal(40, quotes[0].BidSize);
+            Assert.Equal(1781596800421, quotes[0].Timestamp);
+        }
+
+        [Fact]
         public void Constructor_NullToken_Throws()
         {
             Assert.Throws<ArgumentException>(() => new EodhdWebSocketClient<ForexQuote>(null, "forex"));
