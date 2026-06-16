@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 using EODHD.CSharpApiClient.JsonSupport;
@@ -18,10 +19,16 @@ namespace EODHD.CSharpApiClient.DataModel
         public string Code { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unix epoch timestamp (seconds) of the quote.
+        /// Gets or sets the quote timestamp, in seconds since the Unix epoch.
         /// </summary>
         [JsonPropertyName("timestamp")]
-        public long? Timestamp { get; set; }
+        public long? TimestampSec { get; set; }
+
+        /// <summary>
+        /// Gets the quote timestamp as a UTC instant (derived from <see cref="TimestampSec"/>).
+        /// </summary>
+        [JsonIgnore]
+        public DateTimeOffset? TimestampUtc => UnixTime.FromSeconds(this.TimestampSec);
 
         /// <summary>
         /// Gets or sets the GMT offset applied to the quote time.

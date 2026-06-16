@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed (explicit epoch units + UTC accessors)
+- Renamed every raw Unix-epoch field to carry its unit: millisecond fields are now `…Ms`
+  (`TimestampMs`, `BidTimeMs`, `AskTimeMs`, `LastTradeTimeMs`, `EthTimeMs`) and second fields are now
+  `…Sec` (`TimestampSec` on intraday bars and the real-time quote). The JSON wire keys are unchanged.
+- Added a `…Utc` companion (`DateTimeOffset?`, offset `+00:00`) next to each, computed via a shared
+  `UnixTime` helper — so consumers get a correct UTC instant without knowing the unit (e.g.
+  `quote.TimestampUtc`). `DateTimeOffset` is used (over `DateTime`) so the value is an unambiguous instant
+  that can't be misread as local time.
+
 ### Added (live streaming — WebSocket: US trades & quotes)
 - US live feeds via `EodhdWebSocketClient.UsTrades(...)` (trade prints) and `EodhdWebSocketClient.UsQuotes(...)`
   (top-of-book), with typed messages `UsTrade` (price, sale-condition codes, volume, dark-pool flag, market

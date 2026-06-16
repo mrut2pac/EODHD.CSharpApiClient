@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace EODHD.CSharpApiClient.DataModel.Quotes
@@ -88,21 +89,33 @@ namespace EODHD.CSharpApiClient.DataModel.Quotes
         [JsonPropertyName("size")]
         public long? Size { get; set; }
 
-        /// <summary>Gets or sets the bid timestamp (Unix epoch milliseconds).</summary>
+        /// <summary>Gets or sets the bid timestamp, in milliseconds since the Unix epoch.</summary>
         [JsonPropertyName("bidTime")]
-        public long? BidTime { get; set; }
+        public long? BidTimeMs { get; set; }
 
-        /// <summary>Gets or sets the ask timestamp (Unix epoch milliseconds).</summary>
+        /// <summary>Gets the bid timestamp as a UTC instant (derived from <see cref="BidTimeMs"/>).</summary>
+        [JsonIgnore]
+        public DateTimeOffset? BidTimeUtc => UnixTime.FromMilliseconds(this.BidTimeMs);
+
+        /// <summary>Gets or sets the ask timestamp, in milliseconds since the Unix epoch.</summary>
         [JsonPropertyName("askTime")]
-        public long? AskTime { get; set; }
+        public long? AskTimeMs { get; set; }
+
+        /// <summary>Gets the ask timestamp as a UTC instant (derived from <see cref="AskTimeMs"/>).</summary>
+        [JsonIgnore]
+        public DateTimeOffset? AskTimeUtc => UnixTime.FromMilliseconds(this.AskTimeMs);
 
         /// <summary>Gets or sets the last trade price.</summary>
         [JsonPropertyName("lastTradePrice")]
         public double? LastTradePrice { get; set; }
 
-        /// <summary>Gets or sets the last trade timestamp (Unix epoch milliseconds).</summary>
+        /// <summary>Gets or sets the last trade timestamp, in milliseconds since the Unix epoch.</summary>
         [JsonPropertyName("lastTradeTime")]
-        public long? LastTradeTime { get; set; }
+        public long? LastTradeTimeMs { get; set; }
+
+        /// <summary>Gets the last trade timestamp as a UTC instant (derived from <see cref="LastTradeTimeMs"/>).</summary>
+        [JsonIgnore]
+        public DateTimeOffset? LastTradeTimeUtc => UnixTime.FromMilliseconds(this.LastTradeTimeMs);
 
         /// <summary>Gets or sets the traded volume.</summary>
         [JsonPropertyName("volume")]
@@ -188,9 +201,13 @@ namespace EODHD.CSharpApiClient.DataModel.Quotes
         [JsonPropertyName("ethVolume")]
         public long? EthVolume { get; set; }
 
-        /// <summary>Gets or sets the extended-hours (ETH) timestamp (Unix epoch milliseconds).</summary>
+        /// <summary>Gets or sets the extended-hours (ETH) timestamp, in milliseconds since the Unix epoch.</summary>
         [JsonPropertyName("ethTime")]
-        public long? EthTime { get; set; }
+        public long? EthTimeMs { get; set; }
+
+        /// <summary>Gets the extended-hours (ETH) timestamp as a UTC instant (derived from <see cref="EthTimeMs"/>).</summary>
+        [JsonIgnore]
+        public DateTimeOffset? EthTimeUtc => UnixTime.FromMilliseconds(this.EthTimeMs);
 
         /// <summary>Gets or sets the trading currency.</summary>
         [JsonPropertyName("currency")]
@@ -212,8 +229,12 @@ namespace EODHD.CSharpApiClient.DataModel.Quotes
         [JsonPropertyName("issuerShortName")]
         public string IssuerShortName { get; set; }
 
-        /// <summary>Gets or sets the quote timestamp (Unix epoch milliseconds).</summary>
+        /// <summary>Gets or sets the quote timestamp, in milliseconds since the Unix epoch.</summary>
         [JsonPropertyName("timestamp")]
-        public long? Timestamp { get; set; }
+        public long? TimestampMs { get; set; }
+
+        /// <summary>Gets the quote timestamp as a UTC instant (derived from <see cref="TimestampMs"/>).</summary>
+        [JsonIgnore]
+        public DateTimeOffset? TimestampUtc => UnixTime.FromMilliseconds(this.TimestampMs);
     }
 }

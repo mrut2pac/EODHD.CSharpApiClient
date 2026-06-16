@@ -11,9 +11,16 @@ namespace EODHD.CSharpApiClient.DataModel
     public sealed class IntradayHistoricalStockPrice
     {
         /// <summary>
-        /// Gets or sets the Unix epoch timestamp (seconds) of the bar.
+        /// Gets or sets the bar timestamp, in seconds since the Unix epoch.
         /// </summary>
-        public long? Timestamp { get; set; }
+        [JsonPropertyName("timestamp")]
+        public long? TimestampSec { get; set; }
+
+        /// <summary>
+        /// Gets the bar timestamp as a UTC instant (derived from <see cref="TimestampSec"/>).
+        /// </summary>
+        [JsonIgnore]
+        public DateTimeOffset? TimestampUtc => UnixTime.FromSeconds(this.TimestampSec);
 
         /// <summary>
         /// Gets or sets the GMT offset in seconds applied to the bar time.

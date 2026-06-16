@@ -83,7 +83,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(1.1586, quotes[0].Bid);
             Assert.Equal(-0.0016, quotes[0].DayChange);
             Assert.True(quotes[0].Ppms);
-            Assert.Equal(1781593336816, quotes[0].Timestamp);
+            Assert.Equal(1781593336816, quotes[0].TimestampMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781593336816), quotes[0].TimestampUtc);
             Assert.Contains("{\"action\":\"subscribe\",\"symbols\":\"EURUSD\"}", connection.Sent);
             Assert.Contains("forex?api_token=test", connection.LastUri.ToString(), StringComparison.Ordinal);
         }
@@ -163,7 +164,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(7, trades[0].Volume);
             Assert.False(trades[0].DarkPool);
             Assert.Equal("extended-hours", trades[0].MarketStatus);
-            Assert.Equal(1781596800421, trades[0].Timestamp);
+            Assert.Equal(1781596800421, trades[0].TimestampMs);
         }
 
         [Fact]
@@ -182,7 +183,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(200, quotes[0].AskSize);
             Assert.Equal(405.05, quotes[0].BidPrice);
             Assert.Equal(40, quotes[0].BidSize);
-            Assert.Equal(1781596800421, quotes[0].Timestamp);
+            Assert.Equal(1781596800421, quotes[0].TimestampMs);
         }
 
         [Fact]

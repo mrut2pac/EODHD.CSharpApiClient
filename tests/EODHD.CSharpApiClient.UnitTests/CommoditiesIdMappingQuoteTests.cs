@@ -83,7 +83,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal("XNAS", q.Exchange);
             Assert.Equal(296.15, q.BidPrice);
             Assert.Equal(40, q.AskSize);
-            Assert.Equal(1781555138000, q.BidTime);
+            Assert.Equal(1781555138000, q.BidTimeMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781555138000), q.BidTimeUtc);
             Assert.Equal(4347959000000m, q.MarketCap);
             Assert.Equal(29.5, q.ForwardPe);
             Assert.True(q.Primary);
