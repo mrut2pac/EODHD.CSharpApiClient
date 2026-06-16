@@ -25,6 +25,8 @@ using EODHD.CSharpApiClient.DataModel.Options;
 using EODHD.CSharpApiClient.DataModel.Screener;
 using EODHD.CSharpApiClient.DataModel.Sentiment;
 using EODHD.CSharpApiClient.DataModel.TechnicalIndicators;
+using EODHD.CSharpApiClient.DataModel.Treasury;
+using EODHD.CSharpApiClient.DataModel.UpcomingDividends;
 using EODHD.CSharpApiClient.DataModel.UpcomingEarnings;
 using EODHD.CSharpApiClient.DataModel.UpcomingIpos;
 using EODHD.CSharpApiClient.DataModel.UpcomingSplits;
@@ -1389,6 +1391,166 @@ namespace EODHD.CSharpApiClient
             return this.GetOptionContractsAsync(underlyingSymbol, optionType, strikeFrom, strikeTo, expirationFrom, expirationTo, sort, offset, limit, extraParameters).GetAwaiter().GetResult();
         }
 
+        // ================================================================
+        // Calendar — Upcoming Dividends
+        // ================================================================
+
+        /// <summary>
+        /// Returns the upcoming-dividends calendar (ex-dividend dates). At least one of
+        /// <paramref name="symbol"/> or <paramref name="dateEqual"/> must be supplied (the API requires it).
+        /// </summary>
+        /// <param name="symbol">Optional symbol to filter to (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="dateEqual">Optional exact date filter. Required when <paramref name="symbol"/> is not supplied.</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The upcoming-dividend entries.</returns>
+        public async Task<UpcomingDividend[]> GetUpcomingDividendsAsync(string symbol = null, DateTime? dateEqual = null, DateTime? from = null, DateTime? to = null, int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            if(string.IsNullOrWhiteSpace(symbol) && !dateEqual.HasValue)
+            {
+                throw new ArgumentException("Either symbol or dateEqual must be supplied.", nameof(symbol));
+            }
+
+            DataEnvelope<UpcomingDividend> response = await this.GetJsonAsync<DataEnvelope<UpcomingDividend>>(
+                "calendar/dividends",
+                ct,
+                ("filter[symbol]", symbol),
+                ("filter[date_eq]", FormatDate(dateEqual)),
+                ("filter[date_from]", FormatDate(from)),
+                ("filter[date_to]", FormatDate(to)),
+                ("page[offset]", FormatInt(offset)),
+                ("page[limit]", FormatInt(limit))).ConfigureAwait(false);
+
+            return response?.Data ?? Array.Empty<UpcomingDividend>();
+        }
+
+        /// <summary>
+        /// Returns the upcoming-dividends calendar (ex-dividend dates). At least one of
+        /// <paramref name="symbol"/> or <paramref name="dateEqual"/> must be supplied.
+        /// </summary>
+        /// <param name="symbol">Optional symbol to filter to (e.g. <c>"AAPL.US"</c>).</param>
+        /// <param name="dateEqual">Optional exact date filter. Required when <paramref name="symbol"/> is not supplied.</param>
+        /// <param name="from">Optional inclusive start date.</param>
+        /// <param name="to">Optional inclusive end date.</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The upcoming-dividend entries.</returns>
+        public UpcomingDividend[] GetUpcomingDividends(string symbol = null, DateTime? dateEqual = null, DateTime? from = null, DateTime? to = null, int? offset = null, int? limit = null)
+        {
+            return this.GetUpcomingDividendsAsync(symbol, dateEqual, from, to, offset, limit).GetAwaiter().GetResult();
+        }
+
+        // ================================================================
+        // US Treasury Rates API
+        // ================================================================
+
+        /// <summary>
+        /// Returns the daily US Treasury par yield curve rates. When <paramref name="year"/> is omitted,
+        /// the API returns the current year.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The Treasury yield-curve rates.</returns>
+        public Task<TreasuryRate[]> GetTreasuryYieldRatesAsync(int? year = null, int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            return this.GetTreasuryRatesAsync<TreasuryRate>("ust/yield-rates", year, offset, limit, ct);
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury par yield curve rates.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The Treasury yield-curve rates.</returns>
+        public TreasuryRate[] GetTreasuryYieldRates(int? year = null, int? offset = null, int? limit = null)
+        {
+            return this.GetTreasuryYieldRatesAsync(year, offset, limit).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury real (inflation-indexed) yield curve rates. When
+        /// <paramref name="year"/> is omitted, the API returns the current year.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The Treasury real yield-curve rates.</returns>
+        public Task<TreasuryRate[]> GetTreasuryRealYieldRatesAsync(int? year = null, int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            return this.GetTreasuryRatesAsync<TreasuryRate>("ust/real-yield-rates", year, offset, limit, ct);
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury real (inflation-indexed) yield curve rates.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The Treasury real yield-curve rates.</returns>
+        public TreasuryRate[] GetTreasuryRealYieldRates(int? year = null, int? offset = null, int? limit = null)
+        {
+            return this.GetTreasuryRealYieldRatesAsync(year, offset, limit).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury bill rates (discount and coupon-equivalent). When
+        /// <paramref name="year"/> is omitted, the API returns the current year.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The Treasury bill rates.</returns>
+        public Task<TreasuryBillRate[]> GetTreasuryBillRatesAsync(int? year = null, int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            return this.GetTreasuryRatesAsync<TreasuryBillRate>("ust/bill-rates", year, offset, limit, ct);
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury bill rates (discount and coupon-equivalent).
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The Treasury bill rates.</returns>
+        public TreasuryBillRate[] GetTreasuryBillRates(int? year = null, int? offset = null, int? limit = null)
+        {
+            return this.GetTreasuryBillRatesAsync(year, offset, limit).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury long-term rates. When <paramref name="year"/> is omitted, the API
+        /// returns the current year.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The Treasury long-term rates.</returns>
+        public Task<TreasuryLongTermRate[]> GetTreasuryLongTermRatesAsync(int? year = null, int? offset = null, int? limit = null, CancellationToken ct = default)
+        {
+            return this.GetTreasuryRatesAsync<TreasuryLongTermRate>("ust/long-term-rates", year, offset, limit, ct);
+        }
+
+        /// <summary>
+        /// Returns the daily US Treasury long-term rates.
+        /// </summary>
+        /// <param name="year">Optional calendar year to fetch (e.g. <c>2024</c>).</param>
+        /// <param name="offset">Optional pagination offset.</param>
+        /// <param name="limit">Optional page size.</param>
+        /// <returns>The Treasury long-term rates.</returns>
+        public TreasuryLongTermRate[] GetTreasuryLongTermRates(int? year = null, int? offset = null, int? limit = null)
+        {
+            return this.GetTreasuryLongTermRatesAsync(year, offset, limit).GetAwaiter().GetResult();
+        }
+
         /// <summary>
         /// Releases the underlying HTTP transport (and its <see cref="HttpClient"/>) and the rate limiter.
         /// </summary>
@@ -1411,6 +1573,18 @@ namespace EODHD.CSharpApiClient
         private static string FormatDouble(double? value)
         {
             return value?.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private async Task<T[]> GetTreasuryRatesAsync<T>(string path, int? year, int? offset, int? limit, CancellationToken ct)
+        {
+            DataEnvelope<T> response = await this.GetJsonAsync<DataEnvelope<T>>(
+                path,
+                ct,
+                ("filter[year]", FormatInt(year)),
+                ("page[offset]", FormatInt(offset)),
+                ("page[limit]", FormatInt(limit))).ConfigureAwait(false);
+
+            return response?.Data ?? Array.Empty<T>();
         }
 
         private async Task<OptionData[]> GetMarketplaceOptionsAsync(string path, string underlyingSymbol, string optionType, double? strikeFrom, double? strikeTo, DateTime? expirationFrom, DateTime? expirationTo, DateTime? tradeDateFrom, DateTime? tradeDateTo, string sort, int? offset, int? limit, IReadOnlyDictionary<string, string> extraParameters, CancellationToken ct)

@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (REST coverage — upcoming dividends, US Treasury rates)
+- Upcoming-dividends calendar (`GetUpcomingDividends[Async]`) — ex-dividend dates, filtered by symbol
+  and/or date (the API requires at least one of symbol or an exact date).
+- US Treasury rates: yield curve (`GetTreasuryYieldRates[Async]`), real yield curve
+  (`GetTreasuryRealYieldRates[Async]`), bills (`GetTreasuryBillRates[Async]`), and long-term
+  (`GetTreasuryLongTermRates[Async]`). Filterable by calendar `year`; the API defaults to the current
+  year (its documented `from`/`to` parameters do not filter, so the client does not expose them).
+- Unit tests for all groups; `SkippableFact` integration tests (verified live).
+
 ### Added (REST coverage — options)
 - Legacy options chain (`GetOptionsChain[Async]`) — the nested per-expiration structure with call/put
   contracts, pricing, and greeks. Timestamp fields that use a zero sentinel
