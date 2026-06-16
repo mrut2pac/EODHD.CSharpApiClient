@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added (live streaming — WebSocket: US trades & quotes)
+- US live feeds via `EodhdWebSocketClient.UsTrades(...)` (trade prints) and `EodhdWebSocketClient.UsQuotes(...)`
+  (top-of-book), with typed messages `UsTrade` (price, sale-condition codes, volume, dark-pool flag, market
+  status) and `UsQuote` (bid/ask price and size). They stream during US regular and extended (pre/post-market)
+  hours; an index ETF (SPY, QQQ, …) gives live index exposure. Message shapes captured live at pre-market.
+- Unit tests (US trade/quote parsing incl. condition-code arrays); `SkippableFact` integration tests that
+  stream live US trades and quotes (skipped when the US market is closed).
+
 ### Added (live streaming — WebSocket: forex & crypto)
 - `EodhdWebSocketClient<TMessage>` — a streaming client for the EODHD live (WebSocket) feeds, created via
   `EodhdWebSocketClient.Forex(...)` and `EodhdWebSocketClient.Crypto(...)`. Messages are delivered as an

@@ -40,6 +40,32 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             Assert.True(first.Timestamp.HasValue);
         }
 
+        [SkippableFact]
+        public async Task UsTrades_StreamsLiveTrades()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdWebSocketClient<UsTrade> client = EodhdWebSocketClient.UsTrades(this.ApiToken);
+
+            UsTrade first = await FirstOrNullAsync(client.ReadMessagesAsync(new[] { "SPY", "TSLA", "AAPL" }, Timeout()));
+
+            Skip.If(first == null, "No live US trade received (US market likely closed — streams during regular and extended hours only).");
+            Assert.False(string.IsNullOrEmpty(first.Symbol));
+            Assert.True(first.Timestamp.HasValue);
+        }
+
+        [SkippableFact]
+        public async Task UsQuotes_StreamsLiveQuotes()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdWebSocketClient<UsQuote> client = EodhdWebSocketClient.UsQuotes(this.ApiToken);
+
+            UsQuote first = await FirstOrNullAsync(client.ReadMessagesAsync(new[] { "SPY", "TSLA", "AAPL" }, Timeout()));
+
+            Skip.If(first == null, "No live US quote received (US market likely closed — streams during regular and extended hours only).");
+            Assert.False(string.IsNullOrEmpty(first.Symbol));
+            Assert.True(first.AskPrice.HasValue || first.BidPrice.HasValue);
+        }
+
         private static CancellationToken Timeout()
         {
             return new CancellationTokenSource(TimeSpan.FromSeconds(25)).Token;

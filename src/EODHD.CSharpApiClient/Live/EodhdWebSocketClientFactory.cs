@@ -24,5 +24,25 @@ namespace EODHD.CSharpApiClient.Live
         {
             return new EodhdWebSocketClient<CryptoTrade>(apiToken, "crypto", options);
         }
+
+        /// <summary>Creates a client for the real-time US trades feed (streams during US regular and
+        /// extended hours).</summary>
+        /// <param name="apiToken">The EODHD API token.</param>
+        /// <param name="options">Optional connection settings.</param>
+        /// <returns>A live US-trade client.</returns>
+        public static EodhdWebSocketClient<UsTrade> UsTrades(string apiToken, EodhdWebSocketOptions options = null)
+        {
+            return new EodhdWebSocketClient<UsTrade>(apiToken, "us", options);
+        }
+
+        /// <summary>Creates a client for the real-time US quotes (top-of-book) feed (streams during US
+        /// regular and extended hours).</summary>
+        /// <param name="apiToken">The EODHD API token.</param>
+        /// <param name="options">Optional connection settings.</param>
+        /// <returns>A live US-quote client.</returns>
+        public static EodhdWebSocketClient<UsQuote> UsQuotes(string apiToken, EodhdWebSocketOptions options = null)
+        {
+            return new EodhdWebSocketClient<UsQuote>(apiToken, "us-quote", options);
+        }
     }
 }
