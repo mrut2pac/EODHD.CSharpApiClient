@@ -39,7 +39,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the tracked index name.
         /// </summary>
-        public string Index_Name { get; set; }
+        public string IndexName { get; set; }
 
         /// <summary>
         /// Gets or sets the yield (percent).

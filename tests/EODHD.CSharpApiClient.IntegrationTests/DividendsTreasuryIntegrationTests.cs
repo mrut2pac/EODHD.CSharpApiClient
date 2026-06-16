@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.DataModel.Treasury;
@@ -22,7 +21,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 dividends = await client.GetUpcomingDividendsAsync("AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -45,7 +44,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 rates = await client.GetTreasuryYieldRatesAsync(year: 2024);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -67,7 +66,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 rates = await client.GetTreasuryRealYieldRatesAsync(year: 2024);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -89,7 +88,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 rates = await client.GetTreasuryBillRatesAsync(year: 2024);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -111,7 +110,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 rates = await client.GetTreasuryLongTermRatesAsync(year: 2024);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.DataModel.Options;
@@ -21,7 +20,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 chain = await client.GetOptionsChainAsync("AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -46,7 +45,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 records = await client.GetOptionsEodAsync("AAPL", limit: 5, sort: "-exp_date");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -69,7 +68,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 records = await client.GetOptionContractsAsync("AAPL", optionType: "call", limit: 5);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

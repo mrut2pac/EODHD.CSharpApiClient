@@ -17,7 +17,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 return await client.GetTechnicalIndicatorAsync("AAPL.US", function, period: period, extraParameters: extra);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

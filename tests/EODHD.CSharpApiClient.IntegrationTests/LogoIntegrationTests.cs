@@ -20,7 +20,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 url = await client.GetLogoUrlAsync("AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -42,7 +42,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 bytes = await client.GetLogoBytesAsync("AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -65,7 +65,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 url = await client.GetLogoUrlAsync("EURUSD.FOREX");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

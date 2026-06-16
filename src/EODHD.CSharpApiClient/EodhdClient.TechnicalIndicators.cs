@@ -1,41 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-using EODHD.CSharpApiClient.DataModel;
-using EODHD.CSharpApiClient.DataModel.Bonds;
-using EODHD.CSharpApiClient.DataModel.BulkFundamental;
-using EODHD.CSharpApiClient.DataModel.Cboe;
-using EODHD.CSharpApiClient.DataModel.Commodities;
-using EODHD.CSharpApiClient.DataModel.EarningsTrends;
-using EODHD.CSharpApiClient.DataModel.EconomicEvents;
-using EODHD.CSharpApiClient.DataModel.ExchangeInfo;
-using EODHD.CSharpApiClient.DataModel.Fundamental;
-using EODHD.CSharpApiClient.DataModel.IdMappings;
-using EODHD.CSharpApiClient.DataModel.InsiderTransactions;
-using EODHD.CSharpApiClient.DataModel.Macro;
-using EODHD.CSharpApiClient.DataModel.MarketCap;
-using EODHD.CSharpApiClient.DataModel.News;
-using EODHD.CSharpApiClient.DataModel.Options;
-using EODHD.CSharpApiClient.DataModel.Quotes;
-using EODHD.CSharpApiClient.DataModel.Screener;
-using EODHD.CSharpApiClient.DataModel.Sentiment;
 using EODHD.CSharpApiClient.DataModel.TechnicalIndicators;
-using EODHD.CSharpApiClient.DataModel.Treasury;
-using EODHD.CSharpApiClient.DataModel.UpcomingDividends;
-using EODHD.CSharpApiClient.DataModel.UpcomingEarnings;
-using EODHD.CSharpApiClient.DataModel.UpcomingIpos;
-using EODHD.CSharpApiClient.DataModel.UpcomingSplits;
-using EODHD.CSharpApiClient.Exceptions;
-using EODHD.CSharpApiClient.Transport;
 
 namespace EODHD.CSharpApiClient
 {

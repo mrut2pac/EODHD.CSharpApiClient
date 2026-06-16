@@ -23,7 +23,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 prices = await client.GetCommodityHistoricalPricesAsync("BRENT");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -45,7 +45,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 mappings = await client.GetIdMappingAsync(symbol: "AAPL.US");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -67,7 +67,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 quotes = await client.GetUsDelayedQuotesAsync(new[] { "AAPL" });
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -90,7 +90,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 symbols = await client.GetOptionUnderlyingSymbolsAsync(limit: 10);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

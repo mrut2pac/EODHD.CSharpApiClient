@@ -24,7 +24,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 news = await client.GetNewsAsync(symbol: "AAPL.US", limit: 10);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -48,7 +48,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
                 sentiment = await client.GetNewsSentimentsAsync(
                     new[] { "AAPL.US", "MSFT.US" }, new DateTime(2022, 1, 1), new DateTime(2022, 6, 1));
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -73,7 +73,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
                 sentiment = await client.GetTweetsSentimentsAsync(
                     new[] { "AAPL.US", "MSFT.US" }, new DateTime(2022, 1, 1), new DateTime(2022, 6, 1));
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -95,7 +95,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
                 events = await client.GetEconomicEventsAsync(
                     new DateTime(2024, 1, 1), new DateTime(2024, 1, 31), country: "US", limit: 50);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;

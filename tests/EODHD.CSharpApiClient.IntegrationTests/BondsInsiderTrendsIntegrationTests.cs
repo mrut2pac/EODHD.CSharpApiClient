@@ -24,7 +24,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 transactions = await client.GetInsiderTransactionsAsync(from: new DateTime(2024, 1, 1), to: new DateTime(2024, 2, 1), limit: 10);
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -47,7 +47,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 bond = await client.GetBondFundamentalsAsync("DE000CB83CF0");
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -70,7 +70,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 trends = await client.GetEarningsTrendsAsync(new[] { "AAPL.US" });
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
@@ -93,7 +93,7 @@ namespace EODHD.CSharpApiClient.IntegrationTests
             {
                 trends = await client.GetEarningsTrendsAsync(new[] { "AAPL.US", "MSFT.US" });
             }
-            catch (EodhdHttpException ex)
+            catch(EodhdHttpException ex)
             {
                 SkipIfNoLicense(ex);
                 throw;
