@@ -194,6 +194,35 @@ namespace EODHD.CSharpApiClient
         }
 
         /// <summary>
+        /// Issues a GET against an absolute <paramref name="uri"/> and returns the raw response bytes.
+        /// Unlike <see cref="GetJsonAsync{T}"/> this neither appends the API token / <c>fmt</c> parameters
+        /// nor deserializes the body; it is used for binary resources such as logo images.
+        /// </summary>
+        private async Task<byte[]> GetBytesAsync(Uri uri, CancellationToken ct)
+        {
+            if(this.rateLimiter != null)
+            {
+                await this.rateLimiter.GateRequestAsync().ConfigureAwait(false);
+            }
+
+            using(HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
+            using(HttpResponseMessage response = await this.transport.SendAsync(request, ct).ConfigureAwait(false))
+            {
+                if(!response.IsSuccessStatusCode)
+                {
+                    string body = response.Content != null
+                        ? await response.Content.ReadAsStringAsync().ConfigureAwait(false)
+                        : string.Empty;
+                    throw EodhdHttpException.Create((int)response.StatusCode, body);
+                }
+
+                return response.Content != null
+                    ? await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false)
+                    : Array.Empty<byte>();
+            }
+        }
+
+        /// <summary>
         /// Builds the absolute request URI from a relative path and query parameters, appending the
         /// <c>api_token</c> and <c>fmt=json</c> parameters and skipping any parameter with a null value.
         /// </summary>
