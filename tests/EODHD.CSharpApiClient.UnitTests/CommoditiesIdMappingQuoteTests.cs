@@ -71,7 +71,9 @@ namespace EODHD.CSharpApiClient.UnitTests
             const string json =
                 "{\"meta\":{\"count\":1},\"data\":{\"AAPL.US\":{\"symbol\":\"AAPL.US\",\"exchange\":\"XNAS\"," +
                 "\"isoExchange\":\"XNAS\",\"bidPrice\":296.15,\"askSize\":40,\"bidTime\":1781555138000," +
-                "\"lastTradePrice\":296.1595,\"marketCap\":4347959000000,\"sharesOutstanding\":15000000000," +
+                "\"askTime\":1781555138100,\"lastTradePrice\":296.1595,\"lastTradeTime\":1781555138200," +
+                "\"ethTime\":1781555138300,\"timestamp\":1781555138400," +
+                "\"marketCap\":4347959000000,\"sharesOutstanding\":15000000000," +
                 "\"forwardPE\":29.5,\"previousCloseDate\":\"2026-06-12 17:00:00\",\"primary\":true}}}";
 
             using EodhdClient client = CreateClient(json, out FakeHttpTransport transport);
@@ -83,7 +85,16 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal("XNAS", q.Exchange);
             Assert.Equal(296.15, q.BidPrice);
             Assert.Equal(40, q.AskSize);
-            Assert.Equal(1781555138000, q.BidTime);
+            Assert.Equal(1781555138000, q.BidTimeMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781555138000), q.BidTimeUtc);
+            Assert.Equal(1781555138100, q.AskTimeMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781555138100), q.AskTimeUtc);
+            Assert.Equal(1781555138200, q.LastTradeTimeMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781555138200), q.LastTradeTimeUtc);
+            Assert.Equal(1781555138300, q.EthTimeMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781555138300), q.EthTimeUtc);
+            Assert.Equal(1781555138400, q.TimestampMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1781555138400), q.TimestampUtc);
             Assert.Equal(4347959000000m, q.MarketCap);
             Assert.Equal(29.5, q.ForwardPe);
             Assert.True(q.Primary);

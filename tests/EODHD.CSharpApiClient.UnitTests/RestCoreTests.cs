@@ -30,7 +30,8 @@ namespace EODHD.CSharpApiClient.UnitTests
                 "AAPL.US", IntradayInterval.OneHour);
 
             Assert.Single(bars);
-            Assert.Equal(1640984100L, bars[0].Timestamp);
+            Assert.Equal(1640984100L, bars[0].TimestampSec);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1640984100L), bars[0].TimestampUtc);
             Assert.Equal(new DateTime(2021, 12, 31, 20, 55, 0), bars[0].DateTime);
             Assert.Equal(177.6, bars[0].Close);
             Assert.Contains("interval=1h", transport.LastRequestUri.ToString(), StringComparison.Ordinal);
@@ -49,6 +50,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             LiveStockPrice quote = await client.GetLivePriceAsync("AAPL.US");
 
             Assert.Equal("AAPL.US", quote.Code);
+            Assert.Equal(1640984100L, quote.TimestampSec);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1640984100L), quote.TimestampUtc);
             Assert.Null(quote.Close);
             Assert.Null(quote.Volume);
             Assert.Null(quote.ChangePercent);

@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace EODHD.CSharpApiClient.DataModel.Live
@@ -27,8 +28,12 @@ namespace EODHD.CSharpApiClient.DataModel.Live
         [JsonPropertyName("dc")]
         public double? DayChangePercent { get; set; }
 
-        /// <summary>Gets or sets the trade timestamp, in milliseconds since the Unix epoch (UTC).</summary>
+        /// <summary>Gets or sets the trade timestamp, in milliseconds since the Unix epoch.</summary>
         [JsonPropertyName("t")]
-        public long? Timestamp { get; set; }
+        public long? TimestampMs { get; set; }
+
+        /// <summary>Gets the trade timestamp as a UTC instant (derived from <see cref="TimestampMs"/>).</summary>
+        [JsonIgnore]
+        public DateTimeOffset? TimestampUtc => UnixTime.FromMilliseconds(this.TimestampMs);
     }
 }

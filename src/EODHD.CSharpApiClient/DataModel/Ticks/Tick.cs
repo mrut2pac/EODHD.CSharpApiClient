@@ -1,3 +1,5 @@
+using System;
+
 namespace EODHD.CSharpApiClient.DataModel.Ticks
 {
     /// <summary>
@@ -27,7 +29,10 @@ namespace EODHD.CSharpApiClient.DataModel.Ticks
         /// <summary>Gets or sets the sales-condition codes for the trade.</summary>
         public string SalesCondition { get; set; }
 
-        /// <summary>Gets or sets the trade timestamp, in milliseconds since the Unix epoch (UTC).</summary>
-        public long? Timestamp { get; set; }
+        /// <summary>Gets or sets the trade timestamp, in milliseconds since the Unix epoch.</summary>
+        public long? TimestampMs { get; set; }
+
+        /// <summary>Gets the trade timestamp as a UTC instant (derived from <see cref="TimestampMs"/>).</summary>
+        public DateTimeOffset? TimestampUtc => UnixTime.FromMilliseconds(this.TimestampMs);
     }
 }

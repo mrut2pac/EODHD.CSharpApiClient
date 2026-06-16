@@ -34,7 +34,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(699924226, ticks[0].Sequence);
             Assert.Equal(10, ticks[0].Shares);
             Assert.Equal("@ TI", ticks[0].SalesCondition);
-            Assert.Equal(1700000001537, ticks[0].Timestamp);
+            Assert.Equal(1700000001537, ticks[0].TimestampMs);
+            Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1700000001537), ticks[0].TimestampUtc);
             // "ex" column absent in this response -> null, not an exception.
             Assert.Null(ticks[0].Exchange);
             Assert.Equal(187.23, ticks[1].Price);

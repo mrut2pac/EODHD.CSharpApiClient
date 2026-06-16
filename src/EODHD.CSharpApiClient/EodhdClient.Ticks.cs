@@ -82,7 +82,7 @@ namespace EODHD.CSharpApiClient
                     Sequence = ItemOrNull(response.Seq, i),
                     Shares = ItemOrNull(response.Shares, i),
                     SalesCondition = ItemOrNull(response.Sl, i),
-                    Timestamp = ItemOrNull(response.Ts, i),
+                    TimestampMs = ItemOrNull(response.Ts, i),
                 };
             }
 
