@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-24
+
+### Fixed
+- README LICENSE link now uses an absolute GitHub URL so it resolves on the NuGet package page (relative links parked on the package page).
+
 ## [1.0.0] - 2026-06-16
 
 ### Changed (explicit epoch units + UTC accessors)
