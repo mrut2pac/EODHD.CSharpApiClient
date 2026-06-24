@@ -108,4 +108,4 @@ catch (EodhdHttpException ex) when (ex.Code == EodhdErrorCase.Unauthorized)
 
 ## License
 
-[MIT](LICENSE). This is an independent, community-maintained client and is not affiliated with or endorsed by EOD Historical Data.
+[MIT](https://github.com/mrut2pac/EODHD.CSharpApiClient/blob/main/LICENSE). This is an independent, community-maintained client and is not affiliated with or endorsed by EOD Historical Data.
