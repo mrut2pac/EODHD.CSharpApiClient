@@ -21,7 +21,7 @@
     <!-- NuGet packaging -->
     <IsPackable>true</IsPackable>
     <PackageId>EODHD.CSharpApiClient</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Vardan Tovmasyan</Authors>
     <Description>Pure-managed, async-first C# client for the EOD Historical Data (EODHD) API. REST coverage for end-of-day and intraday prices, fundamentals, dividends and splits, exchanges, and the calendar — plus the Live (WebSocket) API. Zero runtime dependencies — works on any .NET 8+ runtime.</Description>
     <PackageTags>eodhd;eod-historical-data;market-data;trading;stocks;fundamentals;historical;api-client</PackageTags>
