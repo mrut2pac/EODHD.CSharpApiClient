@@ -10,6 +10,9 @@ All notable changes to this project are documented here. The format is based on
 - `RequestRateLimiter.Dispose` (and so `EodhdClient.Dispose`) no longer blocks for up to a minute: it used to wait out the
   refill loop's pending delay - the rest of the one-minute warm-up after the first request, or one refill interval after that -
   and now cancels it instead.
+- `RequestRateLimiter` refilled permits from `Stopwatch.ElapsedTicks` (Stopwatch ticks) as if they were `TimeSpan` ticks, so
+  wherever `Stopwatch.Frequency` is not 10 MHz (e.g. Linux) it refilled about 100x too fast and did not enforce the configured rate;
+  at 28 requests/minute or fewer the 32-bit tick arithmetic could also overflow. Refill now uses elapsed `TimeSpan`s in 64-bit math.
 
 ## [1.0.1] - 2026-06-24
 

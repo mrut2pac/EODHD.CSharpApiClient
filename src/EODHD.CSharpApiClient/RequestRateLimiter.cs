@@ -95,6 +95,18 @@ namespace EODHD.CSharpApiClient
             this.stopTokenSource.Dispose();
         }
 
+        /// <summary>
+        /// Returns how many whole refill intervals fit in the elapsed time plus the time carried over from the previous pass, and the
+        /// leftover to carry into the next one. Taking <see cref="TimeSpan"/> keeps the caller from mixing tick units.
+        /// </summary>
+        internal static int CalculateReleaseCount(TimeSpan elapsed, TimeSpan interval, TimeSpan carriedOver, out TimeSpan newCarriedOver)
+        {
+            long totalTicks = carriedOver.Ticks + elapsed.Ticks;
+            newCarriedOver = TimeSpan.FromTicks(totalTicks % interval.Ticks);
+            long releaseCount = totalTicks / interval.Ticks;
+            return releaseCount > int.MaxValue ? int.MaxValue : (int)releaseCount;
+        }
+
         private async Task StartLeakyBucketRefill(TimeSpan interval, int maxCount)
         {
             CancellationToken stopToken = this.stopTokenSource.Token;
@@ -111,8 +123,7 @@ namespace EODHD.CSharpApiClient
                 // without risking going over the limit.
                 await Task.Delay(TimeSpan.FromMinutes(1), stopToken).ConfigureAwait(false);
 
-                int intervalTicks = (int)interval.Ticks;
-                int remainderTicks = 0;
+                TimeSpan carriedOver = TimeSpan.Zero;
                 Stopwatch stopwatch = new Stopwatch();
 
                 while(true)
@@ -121,9 +132,7 @@ namespace EODHD.CSharpApiClient
                     await Task.Delay(interval, stopToken).ConfigureAwait(false);
                     stopwatch.Stop();
 
-                    int totalTicks = remainderTicks + (int)stopwatch.ElapsedTicks;
-                    remainderTicks = totalTicks % intervalTicks;
-                    int releaseCount = totalTicks / intervalTicks;
+                    int releaseCount = CalculateReleaseCount(stopwatch.Elapsed, interval, carriedOver, out carriedOver);
                     int releaseCapacity = maxCount - this.requestGateSemaphore.CurrentCount;
 
                     if(releaseCapacity == 0 || releaseCount == 0)
