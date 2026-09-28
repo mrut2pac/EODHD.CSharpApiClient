@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-09-28
+
 ### Fixed
 - `RequestRateLimiter.Dispose` (and so `EodhdClient.Dispose`) no longer blocks for up to a minute: it used to wait out the
   refill loop's pending delay - the rest of the one-minute warm-up after the first request, or one refill interval after that -
@@ -195,5 +197,7 @@ All notable changes to this project are documented here. The format is based on
   split-factor parsing, the rate limiter, and error paths. Integration tests
   (`SkippableFact`, gated on `EODHD_API_KEY`) covering every ported endpoint.
 
-[Unreleased]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.0...main
+[Unreleased]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.2...main
+[1.0.2]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/mrut2pac/EODHD.CSharpApiClient/tree/v1.0.0

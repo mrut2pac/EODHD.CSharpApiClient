@@ -21,7 +21,7 @@
     <!-- NuGet packaging -->
     <IsPackable>true</IsPackable>
     <PackageId>EODHD.CSharpApiClient</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Vardan Tovmasyan</Authors>
     <Description>Pure-managed, async-first C# client for the EOD Historical Data (EODHD) API. REST coverage for end-of-day and intraday prices, fundamentals, dividends and splits, exchanges, and the calendar — plus the Live (WebSocket) API. Zero runtime dependencies — works on any .NET 8+ runtime.</Description>
     <PackageTags>eodhd;eod-historical-data;market-data;trading;stocks;fundamentals;historical;api-client</PackageTags>
@@ -31,11 +31,10 @@
     <RepositoryUrl>https://github.com/mrut2pac/EODHD.CSharpApiClient</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>
-v1.0.0 — first stable release. Full REST coverage (end-of-day and intraday prices, fundamentals,
-dividends and splits, exchanges and the calendar, news and sentiment, technical indicators, screener,
-macro indicators, options, US Treasury rates, CBOE indices, ticker logos, tick data) plus live
-streaming (WebSocket) for forex, crypto, and US trades and quotes. Async-first with synchronous
-wrappers; zero runtime dependencies.
+v1.0.2 — RequestRateLimiter fixes. Dispose (and so EodhdClient.Dispose) no longer blocks for up to a
+minute waiting out the refill loop's pending delay. Refill timing now uses elapsed TimeSpans in 64-bit
+math: it previously read Stopwatch ticks as TimeSpan ticks, refilling about 100x too fast wherever
+Stopwatch.Frequency is not 10 MHz (e.g. Linux), and could overflow at 28 requests/minute or fewer.
 
 Full history: https://github.com/mrut2pac/EODHD.CSharpApiClient/blob/main/CHANGELOG.md
     </PackageReleaseNotes>
