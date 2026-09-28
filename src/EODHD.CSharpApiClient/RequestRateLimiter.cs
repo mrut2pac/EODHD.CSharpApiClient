@@ -17,11 +17,11 @@ namespace EODHD.CSharpApiClient
     public sealed class RequestRateLimiter : IDisposable
     {
         private readonly SemaphoreSlim requestGateSemaphore;
+        private readonly CancellationTokenSource stopTokenSource = new CancellationTokenSource();
         private readonly Task leakyBucketRefillTask;
 
-        private bool disposed;
+        private int disposed;
         private volatile bool started;
-        private volatile bool running = true;
 
         /// <summary>
         /// Initialises a new rate limiter.
@@ -80,58 +80,73 @@ namespace EODHD.CSharpApiClient
         }
 
         /// <summary>
-        /// Stops the refill loop and releases resources.
+        /// Stops the refill loop and releases resources. Returns promptly: the loop's pending delay is canceled rather than waited out.
         /// </summary>
         public void Dispose()
         {
-            if(this.disposed)
+            if(Interlocked.Exchange(ref this.disposed, 1) == 1)
             {
                 return;
             }
 
-            this.running = false;
+            this.stopTokenSource.Cancel();
             this.leakyBucketRefillTask.Wait();
             this.requestGateSemaphore.Dispose();
-            this.disposed = true;
+            this.stopTokenSource.Dispose();
+        }
+
+        /// <summary>
+        /// Returns how many whole refill intervals fit in the elapsed time plus the time carried over from the previous pass, and the
+        /// leftover to carry into the next one. Taking <see cref="TimeSpan"/> keeps the caller from mixing tick units.
+        /// </summary>
+        internal static int CalculateReleaseCount(TimeSpan elapsed, TimeSpan interval, TimeSpan carriedOver, out TimeSpan newCarriedOver)
+        {
+            long totalTicks = carriedOver.Ticks + elapsed.Ticks;
+            newCarriedOver = TimeSpan.FromTicks(totalTicks % interval.Ticks);
+            long releaseCount = totalTicks / interval.Ticks;
+            return releaseCount > int.MaxValue ? int.MaxValue : (int)releaseCount;
         }
 
         private async Task StartLeakyBucketRefill(TimeSpan interval, int maxCount)
         {
-            // Start only after the first request goes through.
-            while(!this.started && this.running)
+            CancellationToken stopToken = this.stopTokenSource.Token;
+
+            try
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
-            }
-
-            if(this.running)
-            {
-                // Wait one full minute before refilling so the initial capacity is served gracefully
-                // without risking going over the limit.
-                await Task.Delay(TimeSpan.FromMinutes(1)).ConfigureAwait(false);
-            }
-
-            int intervalTicks = (int)interval.Ticks;
-            int remainderTicks = 0;
-            Stopwatch stopwatch = new Stopwatch();
-
-            while(this.running)
-            {
-                stopwatch.Restart();
-                await Task.Delay(interval).ConfigureAwait(false);
-                stopwatch.Stop();
-
-                int totalTicks = remainderTicks + (int)stopwatch.ElapsedTicks;
-                remainderTicks = totalTicks % intervalTicks;
-                int releaseCount = totalTicks / intervalTicks;
-                int releaseCapacity = maxCount - this.requestGateSemaphore.CurrentCount;
-
-                if(releaseCapacity == 0 || releaseCount == 0)
+                // Start only after the first request goes through.
+                while(!this.started)
                 {
-                    continue;
+                    await Task.Delay(TimeSpan.FromMilliseconds(10), stopToken).ConfigureAwait(false);
                 }
 
-                releaseCount = releaseCount > releaseCapacity ? releaseCapacity : releaseCount;
-                this.requestGateSemaphore.Release(releaseCount);
+                // Wait one full minute before refilling so the initial capacity is served gracefully
+                // without risking going over the limit.
+                await Task.Delay(TimeSpan.FromMinutes(1), stopToken).ConfigureAwait(false);
+
+                TimeSpan carriedOver = TimeSpan.Zero;
+                Stopwatch stopwatch = new Stopwatch();
+
+                while(true)
+                {
+                    stopwatch.Restart();
+                    await Task.Delay(interval, stopToken).ConfigureAwait(false);
+                    stopwatch.Stop();
+
+                    int releaseCount = CalculateReleaseCount(stopwatch.Elapsed, interval, carriedOver, out carriedOver);
+                    int releaseCapacity = maxCount - this.requestGateSemaphore.CurrentCount;
+
+                    if(releaseCapacity == 0 || releaseCount == 0)
+                    {
+                        continue;
+                    }
+
+                    releaseCount = releaseCount > releaseCapacity ? releaseCapacity : releaseCount;
+                    this.requestGateSemaphore.Release(releaseCount);
+                }
+            }
+            catch(OperationCanceledException) when(stopToken.IsCancellationRequested)
+            {
+                // Dispose stopped the loop
             }
         }
     }

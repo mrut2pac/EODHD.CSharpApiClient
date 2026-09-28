@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 using Xunit;
 
@@ -57,6 +58,71 @@ namespace EODHD.CSharpApiClient.UnitTests
             RequestRateLimiter limiter = new RequestRateLimiter(50);
             limiter.Dispose();
             Assert.False(limiter.IsRunning);
+        }
+
+        [Fact]
+        public void CalculateReleaseCount_OneIntervalElapsed_ReleasesOne()
+        {
+            TimeSpan interval = TimeSpan.FromMilliseconds(100);
+
+            int releaseCount = RequestRateLimiter.CalculateReleaseCount(interval, interval, TimeSpan.Zero, out TimeSpan carriedOver);
+
+            Assert.Equal(1, releaseCount);
+            Assert.Equal(TimeSpan.Zero, carriedOver);
+        }
+
+        [Fact]
+        public void CalculateReleaseCount_PartialInterval_CarriesTheRemainderIntoTheNextPass()
+        {
+            TimeSpan interval = TimeSpan.FromMilliseconds(100);
+
+            int first = RequestRateLimiter.CalculateReleaseCount(TimeSpan.FromMilliseconds(250), interval, TimeSpan.Zero, out TimeSpan carriedOver);
+            Assert.Equal(2, first);
+            Assert.Equal(TimeSpan.FromMilliseconds(50), carriedOver);
+
+            int second = RequestRateLimiter.CalculateReleaseCount(TimeSpan.FromMilliseconds(60), interval, carriedOver, out carriedOver);
+            Assert.Equal(1, second);
+            Assert.Equal(TimeSpan.FromMilliseconds(10), carriedOver);
+        }
+
+        [Fact]
+        public void CalculateReleaseCount_LessThanAnInterval_ReleasesNothingAndKeepsTheTime()
+        {
+            TimeSpan interval = TimeSpan.FromMilliseconds(100);
+
+            int releaseCount = RequestRateLimiter.CalculateReleaseCount(TimeSpan.FromMilliseconds(40), interval, TimeSpan.Zero, out TimeSpan carriedOver);
+
+            Assert.Equal(0, releaseCount);
+            Assert.Equal(TimeSpan.FromMilliseconds(40), carriedOver);
+        }
+
+        [Fact]
+        public void CalculateReleaseCount_LongIntervalAtLowRate_DoesNotOverflow()
+        {
+            // 1 request/minute: five minutes is 3e9 ticks, past Int32.MaxValue
+            TimeSpan interval = TimeSpan.FromMinutes(1);
+
+            int releaseCount = RequestRateLimiter.CalculateReleaseCount(TimeSpan.FromMinutes(5), interval, TimeSpan.Zero, out TimeSpan carriedOver);
+
+            Assert.Equal(5, releaseCount);
+            Assert.Equal(TimeSpan.Zero, carriedOver);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task Dispose_AfterFirstRequest_DoesNotWaitOutTheRefillDelay()
+        {
+            RequestRateLimiter limiter = new RequestRateLimiter(60);
+            await limiter.GateRequestAsync();
+
+            // let the refill loop see the first request and enter its one-minute warm-up delay
+            await System.Threading.Tasks.Task.Delay(TimeSpan.FromMilliseconds(200));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            limiter.Dispose();
+            stopwatch.Stop();
+
+            Assert.False(limiter.IsRunning);
+            Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Dispose took {stopwatch.Elapsed}.");
         }
     }
 }
