@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+- `RequestRateLimiter.Dispose` (and so `EodhdClient.Dispose`) no longer blocks for up to a minute: it used to wait out the
+  refill loop's pending delay - the rest of the one-minute warm-up after the first request, or one refill interval after that -
+  and now cancels it instead.
+
 ## [1.0.1] - 2026-06-24
 
 ### Fixed

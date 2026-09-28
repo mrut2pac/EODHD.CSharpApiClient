@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 using Xunit;
 
@@ -57,6 +58,23 @@ namespace EODHD.CSharpApiClient.UnitTests
             RequestRateLimiter limiter = new RequestRateLimiter(50);
             limiter.Dispose();
             Assert.False(limiter.IsRunning);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task Dispose_AfterFirstRequest_DoesNotWaitOutTheRefillDelay()
+        {
+            RequestRateLimiter limiter = new RequestRateLimiter(60);
+            await limiter.GateRequestAsync();
+
+            // let the refill loop see the first request and enter its one-minute warm-up delay
+            await System.Threading.Tasks.Task.Delay(TimeSpan.FromMilliseconds(200));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            limiter.Dispose();
+            stopwatch.Stop();
+
+            Assert.False(limiter.IsRunning);
+            Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Dispose took {stopwatch.Elapsed}.");
         }
     }
 }
