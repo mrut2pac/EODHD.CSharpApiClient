@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-21
+
 ### Changed (breaking)
 - Date and time fields that were exposed as raw strings are now typed.
   - The date and time properties listed here are plain settable properties, as are the previously get-only ones
@@ -263,7 +265,8 @@ All notable changes to this project are documented here. The format is based on
   split-factor parsing, the rate limiter, and error paths. Integration tests
   (`SkippableFact`, gated on `EODHD_API_KEY`) covering every ported endpoint.
 
-[Unreleased]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.2...main
+[Unreleased]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v2.0.0...main
+[2.0.0]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.2...v2.0.0
 [1.0.2]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/mrut2pac/EODHD.CSharpApiClient/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/mrut2pac/EODHD.CSharpApiClient/tree/v1.0.0
