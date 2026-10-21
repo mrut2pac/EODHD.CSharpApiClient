@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 using EODHD.CSharpApiClient.DataModel.EarningTrends;
 
@@ -15,9 +17,17 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public string Date { get; set; }
 
         /// <summary>
-        /// Gets or sets the date the earnings were reported (ISO date).
+        /// Gets or sets the raw report date string (ISO date).
         /// </summary>
-        public string ReportDate { get; set; }
+        [JsonInclude]
+        [JsonPropertyName("reportDate")]
+        private string ReportDateStr { get; set; }
+
+        /// <summary>
+        /// Gets the date the earnings were reported, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? ReportDate => Utilities.ParseDate(this.ReportDateStr);
 
         /// <summary>
         /// Gets or sets the actual reported earnings per share.

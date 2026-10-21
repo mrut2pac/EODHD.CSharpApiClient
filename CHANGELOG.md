@@ -49,6 +49,11 @@ that references one of them still needs a recompile, and may need a source edit.
   `JsonSupport.CaseInsensitiveDuplicateKeyConverter<T>` keeps the populated one.
 - Crypto `FundamentalData.Tech` (`CryptoTech.Developers`) and `FundamentalData.Resources` (`CryptoResources.Links` /
   `Thumbnail`).
+- New date and time fields are typed, parsed from the raw value the same way as the existing `General.IPODate`.
+  An unparsable value such as `"0000-00-00"` gives `null`.
+  - `DateTime?`: `General.DelistedDate`, `UpcomingEarnings.From` / `To`, `BulkEarnings.ReportDate`, and
+    `MutualFundData.UpdateDate` / `InceptionDate` / `ExpenseRatioDate`.
+  - `TimeOnly?`: `ExchangeEarlyCloseDay.EarlyClose`, the exchange's local closing time.
 - `JsonSupport.NumberTolerantStringConverter` (registered globally for REST and WebSocket) and
   `JsonSupport.NaTolerantInt64Converter`.
 

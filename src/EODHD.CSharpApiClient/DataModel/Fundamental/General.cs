@@ -163,9 +163,17 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public bool? IsDelisted { get; set; }
 
         /// <summary>
-        /// Gets or sets the delisting date (ISO date) of a delisted instrument.
+        /// Gets or sets the raw delisting date string (ISO date).
         /// </summary>
-        public string DelistedDate { get; set; }
+        [JsonInclude]
+        [JsonPropertyName("DelistedDate")]
+        private string DelistedDateStr { get; set; }
+
+        /// <summary>
+        /// Gets the delisting date of a delisted instrument, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? DelistedDate => Utilities.ParseDate(this.DelistedDateStr);
 
         /// <summary>
         /// Gets or sets the company description.

@@ -98,7 +98,7 @@ namespace EODHD.CSharpApiClient.UnitTests
 
             Assert.Equal("XLON", data.General.OperatingMIC);
             Assert.Equal("LSE - MAIN MARKET", data.General.ExchangeMarket);
-            Assert.Equal("2022-10-28", data.General.DelistedDate);
+            Assert.Equal(new DateTime(2022, 10, 28), data.General.DelistedDate);
             Assert.Equal(65959661940996m, data.General.MarketCap);
             Assert.Equal(0.0789, data.Components[0].Weight);
             Assert.Equal(1105000000d, data.Financials.CashFlow.Yearly["2025-09-30"].IssuanceOfCapitalStock);
@@ -107,7 +107,7 @@ namespace EODHD.CSharpApiClient.UnitTests
 
         // Trimmed from VFIAX.US: each section is followed by a lower-case duplicate key carrying null.
         private const string MutualFundJson =
-            "{\"Fund_Style\":null,\"Nav\":681.0144,\"Portfolio_Net_Assets\":\"999999999999\",\"Yield_1Year_YTD\":17.4842,\"Expense_Ratio\":0.0381," +
+            "{\"Fund_Style\":null,\"Nav\":681.0144,\"Update_Date\":\"2026-09-30\",\"Inception_Date\":\"1976-08-31\",\"Expense_Ratio_Date\":\"0000-00-00\",\"Portfolio_Net_Assets\":\"999999999999\",\"Yield_1Year_YTD\":17.4842,\"Expense_Ratio\":0.0381," +
             "\"Asset_Allocation\":{\"0\":{\"Net_%\":-0.1137,\"Long_%\":0.0542,\"Type\":\"Cash\",\"Short_%\":\"0.00000\",\"Category_Average\":null,\"Benchmark\":null}}," +
             "\"Top_Holdings\":{\"0\":{\"Name\":\"TSMC\",\"Weight\":\"4.10%\"}}," +
             "\"Value_Growth\":{\"0\":{\"Name\":\"Price/Book\",\"Category_Average\":4.1,\"Benchmark\":null,\"Stock_Portfolio\":\"3.9\"}}," +
@@ -206,6 +206,9 @@ namespace EODHD.CSharpApiClient.UnitTests
         private static void AssertMutualFund(MutualFundData fund)
         {
             Assert.Equal(681.0144, fund.Nav);
+            Assert.Equal(new DateTime(2026, 9, 30), fund.UpdateDate);
+            Assert.Equal(new DateTime(1976, 8, 31), fund.InceptionDate);
+            Assert.Null(fund.ExpenseRatioDate);
             Assert.Equal(999999999999m, fund.PortfolioNetAssets);
             Assert.Equal(17.4842, fund.Yield1Year);
             Assert.Equal(-0.1137, fund.AssetAllocation[0].NetPercentage);
@@ -240,7 +243,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             BulkFundamentalData aapl = bulk["0"];
             Assert.Equal("XNAS", aapl.General.OperatingMIC);
             Assert.Equal("BBG000B9XRY4", aapl.General.OpenFigi);
-            Assert.Equal("2026-07-30", aapl.Earnings["Last_0"].ReportDate);
+            Assert.Equal(new DateTime(2026, 7, 30), aapl.Earnings["Last_0"].ReportDate);
             Assert.Equal(1597000000d, aapl.Financials.BalanceSheet.YearlyLast0.CashAndEquivalents);
             Assert.Equal("2026-08-05", aapl.Financials.CashFlow.QuarterlyLast0.FilingDate);
         }
@@ -277,7 +280,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal("Pre-Christmas Thursday 2026", day.Holiday);
             Assert.Equal(new DateTime(2026, 12, 24), day.Date);
             Assert.Equal("official", day.Type);
-            Assert.Equal("13:00", day.EarlyClose);
+            Assert.Equal(new TimeOnly(13, 0), day.EarlyClose);
         }
 
         [Fact]
@@ -304,8 +307,8 @@ namespace EODHD.CSharpApiClient.UnitTests
 
             UpcomingEarnings earnings = await client.GetUpcomingEarningsAsync();
 
-            Assert.Equal("2026-10-06", earnings.From);
-            Assert.Equal("2026-10-16", earnings.To);
+            Assert.Equal(new DateTime(2026, 10, 6), earnings.From);
+            Assert.Equal(new DateTime(2026, 10, 16), earnings.To);
         }
     }
 }
