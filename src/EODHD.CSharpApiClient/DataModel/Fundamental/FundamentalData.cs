@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -80,6 +82,13 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public ETFData ETFData { get; set; }
 
         /// <summary>
+        /// Gets or sets the mutual-fund-specific data.
+        /// </summary>
+        [JsonPropertyName("MutualFund_Data")]
+        [JsonConverter(typeof(CaseInsensitiveDuplicateKeyConverter<MutualFundData>))]
+        public MutualFundData MutualFundData { get; set; }
+
+        /// <summary>
         /// Gets or sets the index components, keyed by component index.
         /// </summary>
         public Dictionary<int, Component> Components { get; set; }
@@ -93,5 +102,15 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the index statistics.
         /// </summary>
         public Statistics Statistics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the technical details of a crypto asset.
+        /// </summary>
+        public CryptoTech Tech { get; set; }
+
+        /// <summary>
+        /// Gets or sets the resource links of a crypto asset.
+        /// </summary>
+        public CryptoResources Resources { get; set; }
     }
 }

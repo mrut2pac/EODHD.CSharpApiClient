@@ -208,6 +208,76 @@ namespace EODHD.CSharpApiClient.IntegrationTests
         }
 
         [SkippableFact]
+        public async Task GetFundamentals_MutualFund_ReturnsMutualFundData()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdClient client = this.CreateClient();
+
+            FundamentalData data;
+            try
+            {
+                data = await client.GetFundamentalsDataAsync("VFIAX.US");
+            }
+            catch(EodhdHttpException ex)
+            {
+                SkipIfNoLicense(ex);
+                throw;
+            }
+
+            Assert.NotNull(data.MutualFundData);
+            Assert.True(data.MutualFundData.Nav > 0);
+            Assert.NotEmpty(data.MutualFundData.AssetAllocation);
+            Assert.NotEmpty(data.MutualFundData.MarketCapitalization);
+            Assert.NotEmpty(data.MutualFundData.SectorWeights);
+        }
+
+        [SkippableFact]
+        public async Task GetFundamentals_Crypto_ReturnsStatisticsAndResources()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdClient client = this.CreateClient();
+
+            FundamentalData data;
+            try
+            {
+                data = await client.GetFundamentalsDataAsync("BTC-USD.CC");
+            }
+            catch(EodhdHttpException ex)
+            {
+                SkipIfNoLicense(ex);
+                throw;
+            }
+
+            Assert.Equal(21000000m, data.Statistics.MaxSupply);
+            Assert.NotEmpty(data.Resources.Links);
+        }
+
+        [SkippableFact]
+        public async Task GetFundamentals_SectionFilters_ReturnRequestedSectionsOnly()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdClient client = this.CreateClient();
+
+            FundamentalData single;
+            FundamentalData several;
+            try
+            {
+                single = await client.GetFundamentalsDataAsync("AAPL.US", "General");
+                several = await client.GetFundamentalsDataAsync("AAPL.US", "General,ETF_Data");
+            }
+            catch(EodhdHttpException ex)
+            {
+                SkipIfNoLicense(ex);
+                throw;
+            }
+
+            Assert.Equal("AAPL", single.General.Code);
+            Assert.Null(single.Highlights);
+            Assert.Equal("AAPL", several.General.Code);
+            Assert.Null(several.ETFData);
+        }
+
+        [SkippableFact]
         public async Task GetBulkFundamentals_Dictionary_ReturnsRequestedSymbols()
         {
             this.SkipIfNoApiKey();

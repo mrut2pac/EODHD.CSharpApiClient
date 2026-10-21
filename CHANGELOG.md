@@ -6,10 +6,21 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
-### Changed (breaking)
+### Changed
+These changes alter public types or members, but each one was unusable before: it was reachable only through a
+response that always threw, never bound any data, or was never populated by any call. They ship as a patch. Code
+that references one of them still needs a recompile, and may need a source edit.
 - `ETFData.AverageMarketCapitalizationMillions` is now `decimal?` and `MarketCapitalizationETF.Mega/Big/Medium/Small/Micro`
   are now `double?` (were `string`; see Fixed).
 - Bulk `BalanceSheetData.СashAndEquivalents` is renamed to `CashAndEquivalents` (see Fixed).
+- The mutual-fund row types are corrected to the wire shape. These are `AssetAllocation`, `MarketCapitalization`,
+  `SectorWeights`, `TopHoldings` and `WorldRegion`, ported earlier but never reachable.
+  - `AssetAllocation` percentages are `double?`.
+  - `SectorWeights.Type` is now `Name`.
+  - `TopHoldings.Weight` is the API's `string` (e.g. `"4.10%"`).
+  - `Category_Average`, `Portfolio_%`, `Amount_%` and `Stocks_%` now bind.
+- `GetFundamentalsDataAsync` rejects field-path filters (`"General::Code"`) with `ArgumentException`. They used to
+  throw `JsonException` or return an empty result.
 
 ### Fixed
 - `GetFundamentalsDataAsync` threw for every ETF: `ETF_Data.Average_Mkt_Cap_Mil` and the
@@ -22,6 +33,9 @@ All notable changes to this project are documented here. The format is based on
 - Fields that were silently dropped now bind: `ETFData.IndexName` (`Index_Name`), bulk `CashFlowData.FilingDate`
   (`filing_date`), and bulk `BalanceSheetData.CashAndEquivalents` (renamed from `СashAndEquivalents`, whose
   first letter was a Cyrillic `С`).
+- `GetFundamentalsDataAsync` with `filters` now returns the requested sections. A single section used to come back
+  empty, because the API returns it unwrapped. A section the symbol lacks (sent as `"NA"`) used to throw and is now
+  left `null`.
 
 ### Added
 - Fields the API sends that were not modeled: `SectorWeightETF.RealEstate` / `CommunicationServices`; fundamentals
@@ -29,6 +43,12 @@ All notable changes to this project are documented here. The format is based on
   `CashFlowData.IssuanceOfCapitalStock`; crypto `Statistics.MaxSupply`; bulk `General.OperatingMIC` / `OpenFigi`
   and `BulkEarnings.ReportDate`; `ExchangeDetails.ExchangeEarlyCloseDays`; `UserInfo.SubscriptionMode` /
   `CanManageOrganizations`; `UpcomingEarnings.From` / `To`.
+- `FundamentalData.MutualFundData` (`MutualFund_Data`): NAV, net assets, yields, expense ratio, asset allocation,
+  value/growth, top holdings, market-cap buckets, sector and region weights, and the new `TopCountry` rows. The
+  payload repeats each section under a lower-case key holding `null`; the new
+  `JsonSupport.CaseInsensitiveDuplicateKeyConverter<T>` keeps the populated one.
+- Crypto `FundamentalData.Tech` (`CryptoTech.Developers`) and `FundamentalData.Resources` (`CryptoResources.Links` /
+  `Thumbnail`).
 - `JsonSupport.NumberTolerantStringConverter` (registered globally for REST and WebSocket) and
   `JsonSupport.NaTolerantInt64Converter`.
 

@@ -22,7 +22,12 @@ namespace EODHD.CSharpApiClient.UnitTests
     {
         private static EodhdClient CreateClient(string responseJson)
         {
-            FakeHttpTransport transport = new FakeHttpTransport(HttpStatusCode.OK, responseJson);
+            return CreateClient(responseJson, out FakeHttpTransport _);
+        }
+
+        private static EodhdClient CreateClient(string responseJson, out FakeHttpTransport transport)
+        {
+            transport = new FakeHttpTransport(HttpStatusCode.OK, responseJson);
             return new EodhdClient(new EodhdClientOptions { ApiToken = "test" }, transport);
         }
 
@@ -98,6 +103,125 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(0.0789, data.Components[0].Weight);
             Assert.Equal(1105000000d, data.Financials.CashFlow.Yearly["2025-09-30"].IssuanceOfCapitalStock);
             Assert.Equal(21000000m, data.Statistics.MaxSupply);
+        }
+
+        // Trimmed from VFIAX.US: each section is followed by a lower-case duplicate key carrying null.
+        private const string MutualFundJson =
+            "{\"Fund_Style\":null,\"Nav\":681.0144,\"Portfolio_Net_Assets\":\"999999999999\",\"Yield_1Year_YTD\":17.4842,\"Expense_Ratio\":0.0381," +
+            "\"Asset_Allocation\":{\"0\":{\"Net_%\":-0.1137,\"Long_%\":0.0542,\"Type\":\"Cash\",\"Short_%\":\"0.00000\",\"Category_Average\":null,\"Benchmark\":null}}," +
+            "\"Top_Holdings\":{\"0\":{\"Name\":\"TSMC\",\"Weight\":\"4.10%\"}}," +
+            "\"Value_Growth\":{\"0\":{\"Name\":\"Price/Book\",\"Category_Average\":4.1,\"Benchmark\":null,\"Stock_Portfolio\":\"3.9\"}}," +
+            "\"Market_Capitalization\":{\"0\":{\"Size\":\"Giant\",\"Category_Average\":40.1,\"Benchmark\":null,\"Portfolio_%\":42.5}}," +
+            "\"Sector_Weights\":{\"Bond Sector\":{\"0\":{\"Name\":\"Government\",\"Amount_%\":12.5,\"Stocks_%\":3.5}}}," +
+            "\"World_Regions\":{\"Americas\":{\"0\":{\"Name\":\"North America\",\"Stocks_%\":9.0241}}}," +
+            "\"Top_Countries\":{\"0\":{\"Country\":\"Japan\",\"Amount_%\":\"15.98\"}}," +
+            "\"market_capitalization\":null,\"world_regions\":null,\"sector_weights\":null,\"asset_allocation\":null}";
+
+        [Fact]
+        public async Task GetFundamentals_MutualFund_KeepsSectionsDespiteNullDuplicateKeys()
+        {
+            using EodhdClient client = CreateClient("{\"MutualFund_Data\":" + MutualFundJson + "}");
+
+            FundamentalData data = await client.GetFundamentalsDataAsync("VFIAX.US");
+
+            AssertMutualFund(data.MutualFundData);
+        }
+
+        [Fact]
+        public async Task GetFundamentals_MutualFundNullDuplicateFirst_KeepsLaterData()
+        {
+            const string json =
+                "{\"MutualFund_Data\":{\"market_capitalization\":null," +
+                "\"Market_Capitalization\":{\"0\":{\"Size\":\"Giant\",\"Portfolio_%\":42.5}}}}";
+
+            using EodhdClient client = CreateClient(json);
+
+            FundamentalData data = await client.GetFundamentalsDataAsync("VFIAX.US");
+
+            Assert.Equal(42.5, data.MutualFundData.MarketCapitalization[0].PortfolioPercent);
+        }
+
+        [Fact]
+        public async Task GetFundamentals_Filters_AreTrimmedDeduplicatedAndSent()
+        {
+            using EodhdClient client = CreateClient("{\"Code\":\"AAPL\"}", out FakeHttpTransport transport);
+
+            FundamentalData data = await client.GetFundamentalsDataAsync("AAPL.US", " General , general,");
+
+            Assert.Contains("filter=General&", transport.LastRequestUri.ToString() + "&", StringComparison.Ordinal);
+            Assert.Equal("AAPL", data.General.Code);
+        }
+
+        [Fact]
+        public async Task GetFundamentals_SingleSectionFilter_RewrapsUnwrappedSection()
+        {
+            // A single-section filter returns the section's own object, not { "MutualFund_Data": ... }.
+            using EodhdClient client = CreateClient(MutualFundJson);
+
+            FundamentalData data = await client.GetFundamentalsDataAsync("VFIAX.US", "MutualFund_Data");
+
+            AssertMutualFund(data.MutualFundData);
+        }
+
+        [Fact]
+        public async Task GetFundamentals_FilteredSectionTheSymbolLacks_IsNull()
+        {
+            using EodhdClient single = CreateClient("\"NA\"");
+            FundamentalData none = await single.GetFundamentalsDataAsync("AAPL.US", "ETF_Data");
+            Assert.Null(none.ETFData);
+
+            using EodhdClient multi = CreateClient("{\"General\":{\"Code\":\"AAPL\"},\"ETF_Data\":\"NA\"}");
+            FundamentalData some = await multi.GetFundamentalsDataAsync("AAPL.US", "General,ETF_Data");
+            Assert.Equal("AAPL", some.General.Code);
+            Assert.Null(some.ETFData);
+        }
+
+        [Fact]
+        public async Task GetFundamentals_FieldPathFilter_ThrowsArgumentException()
+        {
+            using EodhdClient client = CreateClient("\"AAPL\"");
+
+            ArgumentException ex = await Assert.ThrowsAsync<ArgumentException>(() => client.GetFundamentalsDataAsync("AAPL.US", "General::Code"));
+
+            Assert.Equal("filters", ex.ParamName);
+        }
+
+        [Fact]
+        public async Task GetFundamentals_Crypto_TechAndResources()
+        {
+            const string json =
+                "{\"Tech\":{\"Developers\":{\"0\":\"Satoshi Nakamoto - Founder\"}}," +
+                "\"Resources\":{\"Links\":{\"website\":{\"0\":\"https://bitcoin.org/\"},\"facebook\":null},\"Thumbnail\":\"/img/btc.png\"}}";
+
+            using EodhdClient client = CreateClient(json);
+
+            FundamentalData data = await client.GetFundamentalsDataAsync("BTC-USD.CC");
+
+            Assert.Equal("Satoshi Nakamoto - Founder", data.Tech.Developers[0]);
+            Assert.Equal("https://bitcoin.org/", data.Resources.Links["website"][0]);
+            Assert.Null(data.Resources.Links["facebook"]);
+            Assert.Equal("/img/btc.png", data.Resources.Thumbnail);
+        }
+
+        private static void AssertMutualFund(MutualFundData fund)
+        {
+            Assert.Equal(681.0144, fund.Nav);
+            Assert.Equal(999999999999m, fund.PortfolioNetAssets);
+            Assert.Equal(17.4842, fund.Yield1Year);
+            Assert.Equal(-0.1137, fund.AssetAllocation[0].NetPercentage);
+            Assert.Equal(0d, fund.AssetAllocation[0].ShortPercentage);
+            Assert.Equal("4.10%", fund.TopHoldings[0].Weight);
+            Assert.Equal("Giant", fund.MarketCapitalization[0].Size);
+            Assert.Equal(42.5, fund.MarketCapitalization[0].PortfolioPercent);
+            Assert.Equal(40.1, fund.MarketCapitalization[0].CategoryAverage);
+            Assert.Equal(4.1, fund.ValueGrowth[0].CategoryAverage);
+            Assert.Equal(3.9, fund.ValueGrowth[0].StockPortfolio);
+            Assert.Equal("Government", fund.SectorWeights["Bond Sector"][0].Name);
+            Assert.Equal(12.5, fund.SectorWeights["Bond Sector"][0].AmountPercent);
+            Assert.Equal(3.5, fund.SectorWeights["Bond Sector"][0].StocksPercent);
+            Assert.Equal(9.0241, fund.WorldRegions["Americas"][0].StocksPercent);
+            Assert.Equal("Japan", fund.TopCountries[0].Country);
+            Assert.Equal(15.98, fund.TopCountries[0].AmountPercent);
         }
 
         [Fact]

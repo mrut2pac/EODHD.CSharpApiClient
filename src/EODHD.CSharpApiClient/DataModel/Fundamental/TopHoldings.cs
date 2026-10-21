@@ -1,7 +1,7 @@
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
-    /// Represents a single top-holding entry within an ETF or fund.
+    /// Represents a single top-holding entry of a mutual fund.
     /// </summary>
     public sealed class TopHoldings
     {
@@ -21,8 +21,8 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Change { get; set; }
 
         /// <summary>
-        /// Gets or sets the holding weight (percent).
+        /// Gets or sets the holding weight as sent by the API, with a percent sign (e.g. <c>"4.10%"</c>).
         /// </summary>
-        public double? Weight { get; set; }
+        public string Weight { get; set; }
     }
 }

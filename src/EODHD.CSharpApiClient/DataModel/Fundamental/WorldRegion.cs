@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
-    /// Represents a world-region weighting entry with its category benchmark.
+    /// Represents a world-region weighting entry of a mutual fund, within a region group (e.g. <c>"Americas"</c>).
     /// </summary>
     public sealed class WorldRegion
     {
@@ -21,6 +21,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the stocks weighting for the region (percent).
         /// </summary>
+        [JsonPropertyName("Stocks_%")]
         public double? StocksPercent { get; set; }
 
         /// <summary>
