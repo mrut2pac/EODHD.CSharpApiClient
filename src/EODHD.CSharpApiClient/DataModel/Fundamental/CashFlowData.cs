@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -9,30 +11,18 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
     public sealed class CashFlowData
     {
         /// <summary>
-        /// Gets or sets the raw report date string (ISO date).
+        /// Gets or sets the report date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Date")]
-        private string DateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
-        /// Gets the report date (ISO date), parsed from the raw value.
+        /// Gets or sets the filing date.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.DateStr);
-
-        /// <summary>
-        /// Gets or sets the raw filing date string (ISO date).
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Filing_date")]
-        private string FilingDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the filing date (ISO date), parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? FilingDate => Utilities.ParseDate(this.FilingDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? FilingDate { get; set; }
 
         /// <summary>
         /// Gets or sets the reporting currency symbol.
@@ -179,5 +169,10 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the free cash flow (currency).
         /// </summary>
         public double? FreeCashFlow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the proceeds from issuance of capital stock (currency).
+        /// </summary>
+        public double? IssuanceOfCapitalStock { get; set; }
     }
 }

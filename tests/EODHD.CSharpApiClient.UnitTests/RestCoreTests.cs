@@ -90,6 +90,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Single(results);
             Assert.Equal("AAPL", results[0].Code);
             Assert.Equal("US0378331005", results[0].Isin);
+            Assert.Equal(new DateTime(2024, 1, 2), results[0].PreviousCloseDate);
             Assert.True(results[0].IsPrimary);
             string uri = transport.LastRequestUri.ToString();
             Assert.Contains("limit=10", uri, StringComparison.Ordinal);

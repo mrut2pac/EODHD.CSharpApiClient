@@ -1,4 +1,7 @@
+using System;
 using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
 {
@@ -8,15 +11,18 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
     public sealed class BalanceSheetData
     {
         /// <summary>
-        /// Gets or sets the reporting-period end date (ISO date).
+        /// Gets or sets the reporting-period end date.
         /// </summary>
-        public string Date { get; set; }
+        [JsonPropertyName("Date")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
-        /// Gets or sets the filing date (ISO date).
+        /// Gets or sets the filing date.
         /// </summary>
         [JsonPropertyName("filing_date")]
-        public string FilingDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? FilingDate { get; set; }
 
         /// <summary>
         /// Gets or sets the reporting currency symbol.
@@ -102,7 +108,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the cash and equivalents (currency).
         /// </summary>
-        public double? СashAndEquivalents { get; set; }
+        public double? CashAndEquivalents { get; set; }
 
         /// <summary>
         /// Gets or sets the total current liabilities (currency).

@@ -69,6 +69,18 @@ namespace EODHD.CSharpApiClient.IntegrationTests
         }
 
         [SkippableFact]
+        public async Task GetLivePrice_DelistedSymbol_ReturnsQuoteWithoutTimestamp()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdClient client = this.CreateClient();
+
+            LiveStockPrice quote = await client.GetLivePriceAsync("LEH.US");
+
+            Assert.Equal("LEH.US", quote.Code);
+            Assert.Null(quote.TimestampSec);
+        }
+
+        [SkippableFact]
         public async Task GetLivePrices_Multiple_ReturnsQuotePerSymbol()
         {
             this.SkipIfNoApiKey();

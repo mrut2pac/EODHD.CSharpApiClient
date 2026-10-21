@@ -26,6 +26,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public decimal? TotalSupply { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum supply that will ever exist.
+        /// </summary>
+        public decimal? MaxSupply { get; set; }
+
+        /// <summary>
         /// Gets or sets the market-cap dominance (percent).
         /// </summary>
         public double? MarketCapDominance { get; set; }

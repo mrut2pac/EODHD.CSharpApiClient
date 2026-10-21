@@ -98,7 +98,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(4347959000000m, q.MarketCap);
             Assert.Equal(29.5, q.ForwardPe);
             Assert.True(q.Primary);
-            Assert.Equal("2026-06-12 17:00:00", q.PreviousCloseDate);
+            Assert.Equal(new DateTime(2026, 6, 12, 17, 0, 0), q.PreviousCloseDate);
             Assert.Contains("s=AAPL", transport.LastRequestUri.ToString(), StringComparison.Ordinal);
         }
 

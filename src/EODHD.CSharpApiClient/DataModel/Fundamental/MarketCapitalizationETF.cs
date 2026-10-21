@@ -8,26 +8,26 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the mega-cap allocation, as a percent.
         /// </summary>
-        public string Mega { get; set; }
+        public double? Mega { get; set; }
 
         /// <summary>
         /// Gets or sets the big-cap allocation, as a percent.
         /// </summary>
-        public string Big { get; set; }
+        public double? Big { get; set; }
 
         /// <summary>
         /// Gets or sets the medium-cap allocation, as a percent.
         /// </summary>
-        public string Medium { get; set; }
+        public double? Medium { get; set; }
 
         /// <summary>
         /// Gets or sets the small-cap allocation, as a percent.
         /// </summary>
-        public string Small { get; set; }
+        public double? Small { get; set; }
 
         /// <summary>
         /// Gets or sets the micro-cap allocation, as a percent.
         /// </summary>
-        public string Micro { get; set; }
+        public double? Micro { get; set; }
     }
 }

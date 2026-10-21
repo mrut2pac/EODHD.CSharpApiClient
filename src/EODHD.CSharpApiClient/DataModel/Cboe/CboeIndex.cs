@@ -1,4 +1,7 @@
+using System;
 using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.Cboe
 {
@@ -23,7 +26,8 @@ namespace EODHD.CSharpApiClient.DataModel.Cboe
 
         /// <summary>Gets or sets the snapshot date.</summary>
         [JsonPropertyName("date")]
-        public string Date { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>Gets or sets the index close value.</summary>
         [JsonPropertyName("index_close")]
@@ -35,11 +39,13 @@ namespace EODHD.CSharpApiClient.DataModel.Cboe
 
         /// <summary>Gets or sets the effective date (single-index endpoint only).</summary>
         [JsonPropertyName("effective_date")]
-        public string EffectiveDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? EffectiveDate { get; set; }
 
         /// <summary>Gets or sets the review date (single-index endpoint only).</summary>
         [JsonPropertyName("review_date")]
-        public string ReviewDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ReviewDate { get; set; }
 
         /// <summary>
         /// Gets or sets the index constituents. Populated only by the single-index endpoint

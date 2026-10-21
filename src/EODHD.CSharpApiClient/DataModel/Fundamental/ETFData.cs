@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
@@ -39,6 +42,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the tracked index name.
         /// </summary>
+        [JsonPropertyName("Index_Name")]
         public string IndexName { get; set; }
 
         /// <summary>
@@ -53,10 +57,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string DividendPayingFrequency { get; set; }
 
         /// <summary>
-        /// Gets or sets the inception date (ISO date).
+        /// Gets or sets the inception date.
         /// </summary>
         [JsonPropertyName("Inception_Date")]
-        public string InceptionDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? InceptionDate { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum annual management charge (percent).
@@ -71,10 +76,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? OngoingCharge { get; set; }
 
         /// <summary>
-        /// Gets or sets the ongoing-charge date (ISO date).
+        /// Gets or sets the ongoing-charge date.
         /// </summary>
         [JsonPropertyName("Date_Ongoing_Charge")]
-        public string DateOngoingCharge { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? DateOngoingCharge { get; set; }
 
         /// <summary>
         /// Gets or sets the net expense ratio (ratio).
@@ -95,7 +101,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the average market capitalization in millions (currency).
         /// </summary>
         [JsonPropertyName("Average_Mkt_Cap_Mil")]
-        public string AverageMarketCapitalizationMillions { get; set; }
+        public decimal? AverageMarketCapitalizationMillions { get; set; }
 
         /// <summary>
         /// Gets or sets the market capitalization breakdown.

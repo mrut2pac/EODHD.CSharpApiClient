@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.Exceptions;
+using EODHD.CSharpApiClient.JsonSupport;
 using EODHD.CSharpApiClient.Transport;
 
 namespace EODHD.CSharpApiClient
@@ -32,11 +33,13 @@ namespace EODHD.CSharpApiClient
         // Property names are matched case-insensitively so EODHD's camelCase wire fields bind to the
         // PascalCase model properties even where a [JsonPropertyName] is not declared. EODHD also
         // string-encodes some numeric fields, so numbers are allowed to be read from JSON strings —
-        // this is set once here rather than with a per-property attribute on every model.
+        // this is set once here rather than with a per-property attribute on every model. The reverse
+        // also happens (a bare number where a string is modeled), so string properties accept numbers.
         private static readonly JsonSerializerOptions DeserializeOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Converters = { new NumberTolerantStringConverter() },
         };
 
         // The screener "filters" value is a JSON array containing comparison operators (> and <). The

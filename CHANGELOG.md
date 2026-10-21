@@ -6,6 +6,72 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed (breaking)
+- Date and time fields that were exposed as raw strings are now typed.
+  - The date and time properties listed here are plain settable properties, as are the previously get-only ones
+    described below. Each is read and written by `JsonSupport.NaTolerantDateConverter` (`DateTime?`) or
+    `JsonSupport.NaTolerantTimeConverter` (`TimeOnly?`), so a blank, `"NA"` or `"0000-00-00"` gives `null`.
+  - Serializing a model now writes the normalized value (`yyyy-MM-dd[ HH:mm:ss]`, `HH:mm:ss`) instead of the raw wire
+    text.
+  - This replaces the private raw string plus get-only parsed property behind `General.IPODate`, `Earning.Date` and others,
+    so those are now settable too, e.g. in test fakes. Their JSON keys are unchanged.
+  - `DateTime?`:
+    - bulk `BalanceSheetData` / `CashFlowData` / `IncomeStatementData` `.Date` / `.FilingDate`, `BulkEarnings.Date`
+      and bulk `Highlights.MostRecentQuarter`
+    - `ETFData.InceptionDate` / `DateOngoingCharge`, and `HistoricalComponent.StartDate` / `EndDate`
+    - `CboeIndex.Date` / `EffectiveDate` / `ReviewDate`
+    - `ScreenerResult.LastDayDataDate`, `SearchResult.PreviousCloseDate` and `UsDelayedQuote.PreviousCloseDate`
+    - `BondFundamentals.UpdateDate` / `LastTradeDate` / `MaturityDate` / `NextCallDate`, and `BondIssueData.IssueDate` /
+      `OfferingDate` / `FirstCouponDate` / `FirstTradingDay`
+  - `TimeOnly?`: `TradingHours.Open` / `Close` / `OpenUTC` / `CloseUTC`.
+  - The options models (`OptionData`, `OptionContract`) keep their raw strings for now. EODHD sends their timestamps in
+    inconsistent formats (`bid_date` is UTC with `Z`; `ask_date` has no zone).
+- `ETFData.AverageMarketCapitalizationMillions` is now `decimal?` and `MarketCapitalizationETF.Mega/Big/Medium/Small/Micro`
+  are now `double?` (were `string`; see Fixed).
+- Bulk `BalanceSheetData.СashAndEquivalents` is renamed to `CashAndEquivalents` (see Fixed).
+- The mutual-fund row types are corrected to the wire shape. These are `AssetAllocation`, `MarketCapitalization`,
+  `SectorWeights`, `TopHoldings` and `WorldRegion`, ported earlier but never reachable.
+  - `AssetAllocation` percentages are `double?`.
+  - `SectorWeights.Type` is now `Name`.
+  - `TopHoldings.Weight` is the API's `string` (e.g. `"4.10%"`).
+  - `Category_Average`, `Portfolio_%`, `Amount_%` and `Stocks_%` now bind.
+- `GetFundamentalsDataAsync` rejects field-path filters (`"General::Code"`) with `ArgumentException`. They used to
+  throw `JsonException` or return an empty result.
+
+### Fixed
+- `GetFundamentalsDataAsync` threw for every ETF: `ETF_Data.Average_Mkt_Cap_Mil` and the
+  `Market_Capitalisation` buckets arrive as JSON numbers but were modeled as `string`.
+  Both are now numeric and still accept a quoted number.
+- `GetLivePriceAsync` / `GetLivePricesAsync` threw for a delisted symbol, whose `timestamp` comes back as `"NA"`;
+  `LiveStockPrice.TimestampSec` now maps it to `null`, like the price fields.
+- Any `string` property now accepts a JSON number or boolean and keeps its wire text, instead of failing the whole
+  response, since EODHD switches some fields between quoted and bare values from one symbol to the next.
+- Fields that were silently dropped now bind: `ETFData.IndexName` (`Index_Name`), bulk `CashFlowData.FilingDate`
+  (`filing_date`), and bulk `BalanceSheetData.CashAndEquivalents` (renamed from `СashAndEquivalents`, whose
+  first letter was a Cyrillic `С`).
+- `GetFundamentalsDataAsync` with `filters` now returns the requested sections. A single section used to come back
+  empty, because the API returns it unwrapped. A section the symbol lacks (sent as `"NA"`) used to throw and is now
+  left `null`.
+
+### Added
+- Fields the API sends that were not modeled: `SectorWeightETF.RealEstate` / `CommunicationServices`; fundamentals
+  `General.OperatingMIC` / `ExchangeMarket` / `DelistedDate` / `MarketCap` (indices); `Component.Weight`;
+  `CashFlowData.IssuanceOfCapitalStock`; crypto `Statistics.MaxSupply`; bulk `General.OperatingMIC` / `OpenFigi`
+  and `BulkEarnings.ReportDate`; `ExchangeDetails.ExchangeEarlyCloseDays`; `UserInfo.SubscriptionMode` /
+  `CanManageOrganizations`; `UpcomingEarnings.From` / `To`.
+- `FundamentalData.MutualFundData` (`MutualFund_Data`): NAV, net assets, yields, expense ratio, asset allocation,
+  value/growth, top holdings, market-cap buckets, sector and region weights, and the new `TopCountry` rows. The
+  payload repeats each section under a lower-case key holding `null`; the new
+  `JsonSupport.CaseInsensitiveDuplicateKeyConverter<T>` keeps the populated one.
+- Crypto `FundamentalData.Tech` (`CryptoTech.Developers`) and `FundamentalData.Resources` (`CryptoResources.Links` /
+  `Thumbnail`).
+- New date and time fields are typed, using the same converters as above.
+  - `DateTime?`: `General.DelistedDate`, `UpcomingEarnings.From` / `To`, `BulkEarnings.ReportDate`, and
+    `MutualFundData.UpdateDate` / `InceptionDate` / `ExpenseRatioDate`.
+  - `TimeOnly?`: `ExchangeEarlyCloseDay.EarlyClose`, the exchange's local closing time.
+- `JsonSupport.NumberTolerantStringConverter` (registered globally for REST and WebSocket),
+  `JsonSupport.NaTolerantInt64Converter`, `JsonSupport.NaTolerantDateConverter` and `JsonSupport.NaTolerantTimeConverter`.
+
 ## [1.0.2] - 2026-09-28
 
 ### Fixed

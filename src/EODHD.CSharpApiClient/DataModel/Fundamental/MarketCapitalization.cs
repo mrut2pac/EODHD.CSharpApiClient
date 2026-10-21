@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
-    /// Represents market-capitalization allocation data for a fund.
+    /// Represents a market-capitalization size bucket of a mutual fund.
     /// </summary>
     public sealed class MarketCapitalization
     {
@@ -13,6 +15,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the category average, as a percent.
         /// </summary>
+        [JsonPropertyName("Category_Average")]
         public double? CategoryAverage { get; set; }
 
         /// <summary>
@@ -23,6 +26,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the portfolio allocation, as a percent.
         /// </summary>
+        [JsonPropertyName("Portfolio_%")]
         public double? PortfolioPercent { get; set; }
     }
 }

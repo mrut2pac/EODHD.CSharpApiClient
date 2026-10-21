@@ -46,7 +46,7 @@ namespace EODHD.CSharpApiClient.UnitTests
                 "{\"meta\":{\"total\":1},\"data\":[{\"id\":\"BNL30N-2025-09-22\",\"type\":\"cboe-index\"," +
                 "\"attributes\":{\"region\":\"Netherlands\",\"index_code\":\"BNL30N\"," +
                 "\"feed_type\":\"snapshot_official_opening\",\"date\":\"2025-09-22\",\"index_close\":297.2," +
-                "\"index_divisor\":2498050528.313623,\"effective_date\":null,\"review_date\":null}," +
+                "\"index_divisor\":2498050528.313623,\"effective_date\":\"2025-09-19\",\"review_date\":null}," +
                 "\"components\":[{\"id\":\"c1\",\"type\":\"cboe-index-component\",\"attributes\":{" +
                 "\"symbol\":\"KPN.AS\",\"isin\":\"NL0000009082\",\"name\":\"KPN KON ORD\",\"sedol\":null," +
                 "\"closing_price\":4.122,\"currency\":\"EUR\",\"total_shares\":2147483647," +
@@ -58,6 +58,9 @@ namespace EODHD.CSharpApiClient.UnitTests
 
             Assert.NotNull(index);
             Assert.Equal("BNL30N", index.IndexCode);
+            Assert.Equal(new DateTime(2025, 9, 22), index.Date);
+            Assert.Equal(new DateTime(2025, 9, 19), index.EffectiveDate);
+            Assert.Null(index.ReviewDate);
             Assert.NotNull(index.Components);
             Assert.Single(index.Components);
             CboeIndexComponent component = index.Components[0];

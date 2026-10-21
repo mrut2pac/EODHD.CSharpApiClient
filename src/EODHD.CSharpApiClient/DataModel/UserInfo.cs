@@ -27,6 +27,12 @@ namespace EODHD.CSharpApiClient.DataModel
         public string SubscriptionType { get; set; }
 
         /// <summary>
+        /// Gets or sets the subscription mode (e.g. <c>"paid"</c>).
+        /// </summary>
+        [JsonPropertyName("subscriptionMode")]
+        public string SubscriptionMode { get; set; }
+
+        /// <summary>
         /// Gets or sets the payment method on file.
         /// </summary>
         [JsonPropertyName("paymentMethod")]
@@ -67,5 +73,11 @@ namespace EODHD.CSharpApiClient.DataModel
         /// </summary>
         [JsonPropertyName("inviteTokenClicked")]
         public int InviteTokenClicked { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the account can manage organizations.
+        /// </summary>
+        [JsonPropertyName("canManageOrganizations")]
+        public bool? CanManageOrganizations { get; set; }
     }
 }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -28,6 +30,16 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the exchange code.
         /// </summary>
         public string Exchange { get; set; }
+
+        /// <summary>
+        /// Gets or sets the operating market identifier code (MIC) of the exchange (e.g. <c>"XNAS"</c>).
+        /// </summary>
+        public string OperatingMIC { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exchange market segment (e.g. <c>"LSE - MAIN MARKET"</c>).
+        /// </summary>
+        public string ExchangeMarket { get; set; }
 
         /// <summary>
         /// Gets or sets the currency code.
@@ -95,17 +107,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string FiscalYearEnd { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw IPO date string, as an ISO date.
+        /// Gets or sets the IPO date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("IPODate")]
-        private string IpoDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the IPO date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? IPODate => Utilities.ParseDate(this.IpoDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? IPODate { get; set; }
 
         /// <summary>
         /// Gets or sets the international/domestic classification.
@@ -153,6 +159,13 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public bool? IsDelisted { get; set; }
 
         /// <summary>
+        /// Gets or sets the delisting date of a delisted instrument.
+        /// </summary>
+        [JsonPropertyName("DelistedDate")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? DelistedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the company description.
         /// </summary>
         public string Description { get; set; }
@@ -198,17 +211,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public int? FullTimeEmployees { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw last-updated date string, as an ISO date.
+        /// Gets or sets the last-updated date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("UpdatedAt")]
-        private string updatedAtStr { get; set; }
-
-        /// <summary>
-        /// Gets the last-updated date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? UpdatedAt => Utilities.ParseDate(this.updatedAtStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the fund summary.
@@ -244,6 +251,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the market capitalization, as a currency amount.
         /// </summary>
         public double? MarketCapitalization { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total market capitalization of an index (currency); funds report <see cref="MarketCapitalization"/> instead.
+        /// </summary>
+        public decimal? MarketCap { get; set; }
 
         /// <summary>
         /// Gets or sets the category.

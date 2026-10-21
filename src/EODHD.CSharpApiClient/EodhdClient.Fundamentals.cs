@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,30 +21,56 @@ namespace EODHD.CSharpApiClient
         // ================================================================
 
         /// <summary>
-        /// Returns the full fundamentals dataset for a symbol.
+        /// Returns the full fundamentals dataset for a symbol, or only the requested top-level sections.
         /// </summary>
         /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
-        /// <param name="filters">Optional EODHD <c>filter</c> expression to return only part of the dataset.</param>
+        /// <param name="filters">Optional comma-separated top-level sections to return, by their wire names (e.g.
+        /// <c>"General,Highlights"</c>, <c>"ETF_Data"</c>, <c>"MutualFund_Data"</c>). A section the symbol lacks, or an
+        /// unknown name, is left <c>null</c>. Field paths (<c>"General::Code"</c>) are not supported.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>The fundamentals data.</returns>
-        public Task<FundamentalData> GetFundamentalsDataAsync(string symbol, string filters = null, CancellationToken ct = default)
+        public async Task<FundamentalData> GetFundamentalsDataAsync(string symbol, string filters = null, CancellationToken ct = default)
         {
             if(string.IsNullOrWhiteSpace(symbol))
             {
                 throw new ArgumentNullException(nameof(symbol));
             }
 
-            return this.GetJsonAsync<FundamentalData>(
-                "fundamentals/" + Uri.EscapeDataString(symbol),
-                ct,
-                ("filter", filters));
+            string path = "fundamentals/" + Uri.EscapeDataString(symbol);
+            if(string.IsNullOrWhiteSpace(filters))
+            {
+                return await this.GetJsonAsync<FundamentalData>(path, ct).ConfigureAwait(false);
+            }
+
+            if(filters.Contains("::", StringComparison.Ordinal))
+            {
+                throw new ArgumentException(
+                    "Field paths (Section::Field) return values that do not fit FundamentalData; filter by whole sections, e.g. \"General,Highlights\".",
+                    nameof(filters));
+            }
+
+            string[] sections = filters
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            if(sections.Length == 0)
+            {
+                throw new ArgumentException("No section names were given.", nameof(filters));
+            }
+
+            // Read as a JsonElement: a JsonNode read with the client's case-insensitive options would build
+            // case-insensitive objects, which reject the case-variant duplicate keys EODHD sends.
+            JsonElement body = await this.GetJsonAsync<JsonElement>(path, ct, ("filter", string.Join(",", sections))).ConfigureAwait(false);
+            return ToFilteredFundamentals(sections, body);
         }
 
         /// <summary>
-        /// Returns the full fundamentals dataset for a symbol.
+        /// Returns the full fundamentals dataset for a symbol, or only the requested top-level sections.
         /// </summary>
         /// <param name="symbol">The full EODHD symbol (e.g. <c>"AAPL.US"</c>).</param>
-        /// <param name="filters">Optional EODHD <c>filter</c> expression to return only part of the dataset.</param>
+        /// <param name="filters">Optional comma-separated top-level sections to return, by their wire names (e.g.
+        /// <c>"General,Highlights"</c>, <c>"ETF_Data"</c>, <c>"MutualFund_Data"</c>). A section the symbol lacks, or an
+        /// unknown name, is left <c>null</c>. Field paths (<c>"General::Code"</c>) are not supported.</param>
         /// <returns>The fundamentals data.</returns>
         public FundamentalData GetFundamentalsData(string symbol, string filters = null)
         {
@@ -241,6 +270,43 @@ namespace EODHD.CSharpApiClient
         public EarningsTrend[] GetEarningsTrends(IReadOnlyList<string> symbols)
         {
             return this.GetEarningsTrendsAsync(symbols).GetAwaiter().GetResult();
+        }
+
+        // A filtered response is shaped differently from the full one: a single section comes back unwrapped
+        // (the section's own object), and a section the symbol lacks comes back as "NA" (the whole body for a
+        // single section, or that section's value for several). Re-wrap and drop "NA" so it binds as usual.
+        private static FundamentalData ToFilteredFundamentals(string[] sections, JsonElement body)
+        {
+            JsonNode node = JsonNode.Parse(body.GetRawText());
+            JsonObject root;
+            if(sections.Length == 1)
+            {
+                root = new JsonObject { [sections[0]] = node };
+            }
+            else if(node == null)
+            {
+                root = new JsonObject();
+            }
+            else
+            {
+                root = node as JsonObject ?? throw new JsonException("Expected a JSON object for a multi-section fundamentals filter.");
+            }
+
+            List<string> missing = new List<string>();
+            foreach(KeyValuePair<string, JsonNode> section in root)
+            {
+                if(section.Value is JsonValue value && value.TryGetValue(out string text) && string.Equals(text, "NA", StringComparison.Ordinal))
+                {
+                    missing.Add(section.Key);
+                }
+            }
+
+            foreach(string key in missing)
+            {
+                root.Remove(key);
+            }
+
+            return root.Deserialize<FundamentalData>(DeserializeOptions);
         }
     }
 }

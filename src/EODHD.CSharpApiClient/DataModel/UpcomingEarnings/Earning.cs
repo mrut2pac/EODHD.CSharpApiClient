@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
 {
     /// <summary>
@@ -50,30 +52,18 @@ namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
         }
 
         /// <summary>
-        /// Gets or sets the raw report-date string from the wire.
+        /// Gets or sets the report date; <c>null</c> when the API sends no valid date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Report_Date")]
-        private string ReportDateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ReportDate { get; set; }
 
         /// <summary>
-        /// Gets the parsed report date, or <c>null</c> when it cannot be parsed.
+        /// Gets or sets the fiscal period end date; <c>null</c> when the API sends no valid date.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? ReportDate => Utilities.ParseDate(this.ReportDateStr);
-
-        /// <summary>
-        /// Gets or sets the raw date string from the wire.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Date")]
-        private string DateStr { get; set; }
-
-        /// <summary>
-        /// Gets the parsed date, or <c>null</c> when it cannot be parsed.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.DateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
         /// Gets or sets the before/after market indicator.

@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Quotes
 {
     /// <summary>
@@ -133,9 +135,10 @@ namespace EODHD.CSharpApiClient.DataModel.Quotes
         [JsonPropertyName("previousClosePrice")]
         public double? PreviousClosePrice { get; set; }
 
-        /// <summary>Gets or sets the previous close date/time, as sent by the API (space-separated).</summary>
+        /// <summary>Gets or sets the previous close date/time.</summary>
         [JsonPropertyName("previousCloseDate")]
-        public string PreviousCloseDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? PreviousCloseDate { get; set; }
 
         /// <summary>Gets or sets the 50-day average price.</summary>
         [JsonPropertyName("fiftyDayAveragePrice")]

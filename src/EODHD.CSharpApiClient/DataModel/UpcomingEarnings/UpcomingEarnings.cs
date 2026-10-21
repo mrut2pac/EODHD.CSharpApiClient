@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
 {
@@ -21,6 +25,20 @@ namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
         /// Gets or sets the symbols covered by the response.
         /// </summary>
         public string Symbols { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start of the requested date range.
+        /// </summary>
+        [JsonPropertyName("from")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? From { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end of the requested date range.
+        /// </summary>
+        [JsonPropertyName("to")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? To { get; set; }
 
         /// <summary>
         /// Gets or sets the upcoming-earnings entries.

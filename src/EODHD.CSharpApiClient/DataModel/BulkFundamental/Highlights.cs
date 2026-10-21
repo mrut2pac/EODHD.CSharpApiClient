@@ -1,3 +1,8 @@
+using System;
+using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
 {
     /// <summary>
@@ -76,9 +81,11 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public double? EPSEstimateCurrentQuarter { get; set; }
 
         /// <summary>
-        /// Gets or sets the most recent quarter (ISO date).
+        /// Gets or sets the end date of the most recent quarter.
         /// </summary>
-        public string MostRecentQuarter { get; set; }
+        [JsonPropertyName("MostRecentQuarter")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? MostRecentQuarter { get; set; }
 
         /// <summary>
         /// Gets or sets the profit margin (ratio).

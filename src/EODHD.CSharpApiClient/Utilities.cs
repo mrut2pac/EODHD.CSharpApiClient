@@ -5,25 +5,11 @@ namespace EODHD.CSharpApiClient
 {
     /// <summary>
     /// Internal parsing helpers shared by the data-model classes for converting raw EODHD wire strings
-    /// (dates and split ratios) into typed values.
+    /// (split ratios) into typed values.
     /// </summary>
     internal static class Utilities
     {
         private static readonly char[] SplitFactorSeparators = new char[] { ':', '/' };
-
-        /// <summary>
-        /// Parses an EODHD date string into a <see cref="DateTime"/>, returning <c>null</c> when the
-        /// value is missing or not a valid date.
-        /// </summary>
-        public static DateTime? ParseDate(string dateStr)
-        {
-            if(DateTime.TryParse(dateStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
-            {
-                return date;
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// Parses an EODHD split ratio string (e.g. <c>"2.000000/1.000000"</c> or <c>"2:1"</c>) into the

@@ -29,5 +29,10 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the industry.
         /// </summary>
         public string Industry { get; set; }
+
+        /// <summary>
+        /// Gets or sets the constituent's weight in the index, as a fraction (e.g. <c>0.0746</c> for 7.46%).
+        /// </summary>
+        public double? Weight { get; set; }
     }
 }

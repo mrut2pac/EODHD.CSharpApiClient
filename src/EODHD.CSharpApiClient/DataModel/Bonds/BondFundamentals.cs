@@ -1,4 +1,7 @@
+using System;
 using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.Bonds
 {
@@ -26,10 +29,11 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the date the record was last updated (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the date the record was last updated.
         /// </summary>
         [JsonPropertyName("UpdateDate")]
-        public string UpdateDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? UpdateDate { get; set; }
 
         /// <summary>
         /// Gets or sets the German securities identification number (Wertpapierkennnummer).
@@ -68,16 +72,18 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
         public double? Price { get; set; }
 
         /// <summary>
-        /// Gets or sets the last trade date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the last trade date.
         /// </summary>
         [JsonPropertyName("LastTradeDate")]
-        public string LastTradeDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? LastTradeDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the maturity date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the maturity date.
         /// </summary>
         [JsonPropertyName("Maturity_Date")]
-        public string MaturityDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? MaturityDate { get; set; }
 
         /// <summary>
         /// Gets or sets the yield to maturity, percent.
@@ -92,10 +98,11 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
         public string Callable { get; set; }
 
         /// <summary>
-        /// Gets or sets the next call date (<c>yyyy-MM-dd</c>), or <c>null</c>.
+        /// Gets or sets the next call date; <c>null</c> when there is none.
         /// </summary>
         [JsonPropertyName("NextCallDate")]
-        public string NextCallDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? NextCallDate { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum settlement amount (e.g. <c>"100000 EUR"</c>).

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -15,17 +17,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Disclaimer { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw rating date string (ISO date).
+        /// Gets or sets the rating date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("RatingDate")]
-        private string RatingDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the rating date (ISO date), parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? RatingDate => Utilities.ParseDate(this.RatingDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? RatingDate { get; set; }
 
         /// <summary>
         /// Gets or sets the total ESG score.

@@ -1,4 +1,7 @@
+using System;
 using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel
 {
@@ -59,7 +62,8 @@ namespace EODHD.CSharpApiClient.DataModel
         /// Gets or sets the date of the previous close.
         /// </summary>
         [JsonPropertyName("previousCloseDate")]
-        public string PreviousCloseDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? PreviousCloseDate { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this is the instrument's primary exchange listing.

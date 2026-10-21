@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EODHD.CSharpApiClient.JsonSupport;
 using EODHD.CSharpApiClient.Transport;
 
 namespace EODHD.CSharpApiClient.Live
@@ -29,6 +30,7 @@ namespace EODHD.CSharpApiClient.Live
         {
             PropertyNameCaseInsensitive = true,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Converters = { new NumberTolerantStringConverter() },
         };
 
         private readonly string apiToken;

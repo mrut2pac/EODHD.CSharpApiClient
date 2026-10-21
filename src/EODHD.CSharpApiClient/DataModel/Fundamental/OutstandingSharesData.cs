@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -14,17 +16,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Date { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw formatted date string, as an ISO date.
+        /// Gets or sets the date the share count applies to.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("DateFormatted")]
-        private string DateFormattedStr { get; set; }
-
-        /// <summary>
-        /// Gets the formatted date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? DateFormatted => Utilities.ParseDate(this.DateFormattedStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? DateFormatted { get; set; }
 
         /// <summary>
         /// Gets or sets the number of shares in millions, as a count.

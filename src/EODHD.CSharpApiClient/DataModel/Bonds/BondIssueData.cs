@@ -1,4 +1,7 @@
+using System;
 using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.Bonds
 {
@@ -8,28 +11,32 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
     public sealed class BondIssueData
     {
         /// <summary>
-        /// Gets or sets the issue date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the issue date.
         /// </summary>
         [JsonPropertyName("IssueDate")]
-        public string IssueDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? IssueDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the offering date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the offering date.
         /// </summary>
         [JsonPropertyName("OfferingDate")]
-        public string OfferingDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? OfferingDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the first coupon date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the first coupon date.
         /// </summary>
         [JsonPropertyName("FirstCouponDate")]
-        public string FirstCouponDate { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? FirstCouponDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the first trading day (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the first trading day.
         /// </summary>
         [JsonPropertyName("FirstTradingDay")]
-        public string FirstTradingDay { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? FirstTradingDay { get; set; }
 
         /// <summary>
         /// Gets or sets the coupon payment frequency.

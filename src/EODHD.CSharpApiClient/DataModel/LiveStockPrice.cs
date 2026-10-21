@@ -22,6 +22,7 @@ namespace EODHD.CSharpApiClient.DataModel
         /// Gets or sets the quote timestamp, in seconds since the Unix epoch.
         /// </summary>
         [JsonPropertyName("timestamp")]
+        [JsonConverter(typeof(NaTolerantInt64Converter))]
         public long? TimestampSec { get; set; }
 
         /// <summary>

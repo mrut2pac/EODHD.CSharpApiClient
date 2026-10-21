@@ -1,3 +1,8 @@
+using System;
+using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
 {
     /// <summary>
@@ -8,22 +13,30 @@ namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
         /// <summary>
         /// Gets or sets the local open time.
         /// </summary>
-        public string Open { get; set; }
+        [JsonPropertyName("Open")]
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? Open { get; set; }
 
         /// <summary>
         /// Gets or sets the local close time.
         /// </summary>
-        public string Close { get; set; }
+        [JsonPropertyName("Close")]
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? Close { get; set; }
 
         /// <summary>
         /// Gets or sets the open time in UTC.
         /// </summary>
-        public string OpenUTC { get; set; }
+        [JsonPropertyName("OpenUTC")]
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? OpenUTC { get; set; }
 
         /// <summary>
         /// Gets or sets the close time in UTC.
         /// </summary>
-        public string CloseUTC { get; set; }
+        [JsonPropertyName("CloseUTC")]
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? CloseUTC { get; set; }
 
         /// <summary>
         /// Gets or sets the working days of the exchange.

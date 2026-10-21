@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 using EODHD.CSharpApiClient.DataModel.EarningTrends;
+using EODHD.CSharpApiClient.JsonSupport;
 
 namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
 {
@@ -10,9 +13,18 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
     public sealed class BulkEarnings
     {
         /// <summary>
-        /// Gets or sets the earnings date (ISO date).
+        /// Gets or sets the earnings date.
         /// </summary>
-        public string Date { get; set; }
+        [JsonPropertyName("Date")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date the earnings were reported.
+        /// </summary>
+        [JsonPropertyName("reportDate")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ReportDate { get; set; }
 
         /// <summary>
         /// Gets or sets the actual reported earnings per share.

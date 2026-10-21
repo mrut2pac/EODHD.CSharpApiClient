@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -9,30 +11,18 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
     public sealed class IncomeStatementData
     {
         /// <summary>
-        /// Gets or sets the raw period date string, as an ISO date.
+        /// Gets or sets the period date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Date")]
-        private string DateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
-        /// Gets the period date, parsed from the raw string.
+        /// Gets or sets the filing date.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.DateStr);
-
-        /// <summary>
-        /// Gets or sets the raw filing date string, as an ISO date.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Filing_date")]
-        private string filingDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the filing date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? FilingDate => Utilities.ParseDate(this.filingDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? FilingDate { get; set; }
 
         /// <summary>
         /// Gets or sets the currency symbol.

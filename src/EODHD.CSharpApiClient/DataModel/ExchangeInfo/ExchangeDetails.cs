@@ -43,6 +43,11 @@ namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
         public Dictionary<int, ExchangeHoliday> ExchangeHolidays { get; set; }
 
         /// <summary>
+        /// Gets or sets the scheduled early-close (half) days keyed by their ordinal index.
+        /// </summary>
+        public Dictionary<int, ExchangeEarlyCloseDay> ExchangeEarlyCloseDays { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the exchange is currently open.
         /// </summary>
         public bool IsOpen { get; set; }

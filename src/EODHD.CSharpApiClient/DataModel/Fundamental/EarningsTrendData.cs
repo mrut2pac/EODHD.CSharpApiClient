@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -9,17 +11,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
     public sealed class EarningsTrendData
     {
         /// <summary>
-        /// Gets or sets the raw date string (ISO date).
+        /// Gets or sets the date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Date")]
-        private string dateStr { get; set; }
-
-        /// <summary>
-        /// Gets the date (ISO date), parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.dateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
         /// Gets or sets the reporting period.

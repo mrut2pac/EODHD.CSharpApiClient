@@ -1,3 +1,8 @@
+using System;
+using System.Text.Json.Serialization;
+
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -16,14 +21,18 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the membership start date, as an ISO date.
+        /// Gets or sets the membership start date.
         /// </summary>
-        public string StartDate { get; set; }
+        [JsonPropertyName("StartDate")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the membership end date, as an ISO date.
+        /// Gets or sets the membership end date.
         /// </summary>
-        public string EndDate { get; set; }
+        [JsonPropertyName("EndDate")]
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// Gets or sets a flag indicating whether the component is active now.
