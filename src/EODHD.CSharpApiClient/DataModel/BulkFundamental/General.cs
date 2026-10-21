@@ -29,6 +29,11 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public string Exchange { get; set; }
 
         /// <summary>
+        /// Gets or sets the operating market identifier code (MIC) of the exchange (e.g. <c>"XNAS"</c>).
+        /// </summary>
+        public string OperatingMIC { get; set; }
+
+        /// <summary>
         /// Gets or sets the currency code.
         /// </summary>
         public string CurrencyCode { get; set; }
@@ -52,6 +57,11 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// Gets or sets the ISO country code.
         /// </summary>
         public string CountryISO { get; set; }
+
+        /// <summary>
+        /// Gets or sets the OpenFIGI identifier.
+        /// </summary>
+        public string OpenFigi { get; set; }
 
         /// <summary>
         /// Gets or sets the International Securities Identification Number.

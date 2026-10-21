@@ -6,6 +6,32 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed (breaking)
+- `ETFData.AverageMarketCapitalizationMillions` is now `decimal?` and `MarketCapitalizationETF.Mega/Big/Medium/Small/Micro`
+  are now `double?` (were `string`; see Fixed).
+- Bulk `BalanceSheetData.СashAndEquivalents` is renamed to `CashAndEquivalents` (see Fixed).
+
+### Fixed
+- `GetFundamentalsDataAsync` threw for every ETF: `ETF_Data.Average_Mkt_Cap_Mil` and the
+  `Market_Capitalisation` buckets arrive as JSON numbers but were modeled as `string`.
+  Both are now numeric and still accept a quoted number.
+- `GetLivePriceAsync` / `GetLivePricesAsync` threw for a delisted symbol, whose `timestamp` comes back as `"NA"`;
+  `LiveStockPrice.TimestampSec` now maps it to `null`, like the price fields.
+- Any `string` property now accepts a JSON number or boolean and keeps its wire text, instead of failing the whole
+  response, since EODHD switches some fields between quoted and bare values from one symbol to the next.
+- Fields that were silently dropped now bind: `ETFData.IndexName` (`Index_Name`), bulk `CashFlowData.FilingDate`
+  (`filing_date`), and bulk `BalanceSheetData.CashAndEquivalents` (renamed from `СashAndEquivalents`, whose
+  first letter was a Cyrillic `С`).
+
+### Added
+- Fields the API sends that were not modeled: `SectorWeightETF.RealEstate` / `CommunicationServices`; fundamentals
+  `General.OperatingMIC` / `ExchangeMarket` / `DelistedDate` / `MarketCap` (indices); `Component.Weight`;
+  `CashFlowData.IssuanceOfCapitalStock`; crypto `Statistics.MaxSupply`; bulk `General.OperatingMIC` / `OpenFigi`
+  and `BulkEarnings.ReportDate`; `ExchangeDetails.ExchangeEarlyCloseDays`; `UserInfo.SubscriptionMode` /
+  `CanManageOrganizations`; `UpcomingEarnings.From` / `To`.
+- `JsonSupport.NumberTolerantStringConverter` (registered globally for REST and WebSocket) and
+  `JsonSupport.NaTolerantInt64Converter`.
+
 ## [1.0.2] - 2026-09-28
 
 ### Fixed

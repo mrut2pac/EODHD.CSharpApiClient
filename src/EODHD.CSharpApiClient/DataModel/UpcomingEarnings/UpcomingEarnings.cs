@@ -23,6 +23,16 @@ namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
         public string Symbols { get; set; }
 
         /// <summary>
+        /// Gets or sets the start of the requested date range (ISO date).
+        /// </summary>
+        public string From { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end of the requested date range (ISO date).
+        /// </summary>
+        public string To { get; set; }
+
+        /// <summary>
         /// Gets or sets the upcoming-earnings entries.
         /// </summary>
         public List<Earning> Earnings { get; set; }

@@ -55,5 +55,17 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the utilities sector allocation.
         /// </summary>
         public WorldData Utilities { get; set; }
+
+        /// <summary>
+        /// Gets or sets the real estate sector allocation.
+        /// </summary>
+        [JsonPropertyName("Real Estate")]
+        public WorldData RealEstate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the communication services sector allocation.
+        /// </summary>
+        [JsonPropertyName("Communication Services")]
+        public WorldData CommunicationServices { get; set; }
     }
 }

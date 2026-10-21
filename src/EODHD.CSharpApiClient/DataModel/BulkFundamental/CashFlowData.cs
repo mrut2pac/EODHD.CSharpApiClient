@@ -15,6 +15,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the filing date (ISO date).
         /// </summary>
+        [JsonPropertyName("filing_date")]
         public string FilingDate { get; set; }
 
         /// <summary>

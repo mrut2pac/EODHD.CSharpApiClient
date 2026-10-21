@@ -39,6 +39,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// <summary>
         /// Gets or sets the tracked index name.
         /// </summary>
+        [JsonPropertyName("Index_Name")]
         public string IndexName { get; set; }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the average market capitalization in millions (currency).
         /// </summary>
         [JsonPropertyName("Average_Mkt_Cap_Mil")]
-        public string AverageMarketCapitalizationMillions { get; set; }
+        public decimal? AverageMarketCapitalizationMillions { get; set; }
 
         /// <summary>
         /// Gets or sets the market capitalization breakdown.

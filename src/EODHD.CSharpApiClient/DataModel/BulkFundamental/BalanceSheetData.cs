@@ -102,7 +102,7 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         /// <summary>
         /// Gets or sets the cash and equivalents (currency).
         /// </summary>
-        public double? СashAndEquivalents { get; set; }
+        public double? CashAndEquivalents { get; set; }
 
         /// <summary>
         /// Gets or sets the total current liabilities (currency).

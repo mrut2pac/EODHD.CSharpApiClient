@@ -179,5 +179,10 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the free cash flow (currency).
         /// </summary>
         public double? FreeCashFlow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the proceeds from issuance of capital stock (currency).
+        /// </summary>
+        public double? IssuanceOfCapitalStock { get; set; }
     }
 }

@@ -30,6 +30,16 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Exchange { get; set; }
 
         /// <summary>
+        /// Gets or sets the operating market identifier code (MIC) of the exchange (e.g. <c>"XNAS"</c>).
+        /// </summary>
+        public string OperatingMIC { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exchange market segment (e.g. <c>"LSE - MAIN MARKET"</c>).
+        /// </summary>
+        public string ExchangeMarket { get; set; }
+
+        /// <summary>
         /// Gets or sets the currency code.
         /// </summary>
         public string CurrencyCode { get; set; }
@@ -153,6 +163,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public bool? IsDelisted { get; set; }
 
         /// <summary>
+        /// Gets or sets the delisting date (ISO date) of a delisted instrument.
+        /// </summary>
+        public string DelistedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the company description.
         /// </summary>
         public string Description { get; set; }
@@ -244,6 +259,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         /// Gets or sets the market capitalization, as a currency amount.
         /// </summary>
         public double? MarketCapitalization { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total market capitalization of an index (currency); funds report <see cref="MarketCapitalization"/> instead.
+        /// </summary>
+        public decimal? MarketCap { get; set; }
 
         /// <summary>
         /// Gets or sets the category.

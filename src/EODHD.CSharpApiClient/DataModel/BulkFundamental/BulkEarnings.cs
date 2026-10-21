@@ -15,6 +15,11 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public string Date { get; set; }
 
         /// <summary>
+        /// Gets or sets the date the earnings were reported (ISO date).
+        /// </summary>
+        public string ReportDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the actual reported earnings per share.
         /// </summary>
         public double? EpsActual { get; set; }

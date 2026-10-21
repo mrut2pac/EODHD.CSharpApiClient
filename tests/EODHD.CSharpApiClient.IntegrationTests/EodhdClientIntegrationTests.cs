@@ -184,6 +184,30 @@ namespace EODHD.CSharpApiClient.IntegrationTests
         }
 
         [SkippableFact]
+        public async Task GetFundamentals_Etf_ReturnsEtfData()
+        {
+            this.SkipIfNoApiKey();
+            using EodhdClient client = this.CreateClient();
+
+            FundamentalData data;
+            try
+            {
+                data = await client.GetFundamentalsDataAsync("SPY.US");
+            }
+            catch(EodhdHttpException ex)
+            {
+                SkipIfNoLicense(ex);
+                throw;
+            }
+
+            Assert.NotNull(data.ETFData);
+            Assert.True(data.ETFData.AverageMarketCapitalizationMillions > 0);
+            Assert.False(string.IsNullOrEmpty(data.ETFData.IndexName));
+            Assert.NotNull(data.ETFData.MarketCapitalization);
+            Assert.NotNull(data.ETFData.MarketCapitalization.Mega);
+        }
+
+        [SkippableFact]
         public async Task GetBulkFundamentals_Dictionary_ReturnsRequestedSymbols()
         {
             this.SkipIfNoApiKey();
