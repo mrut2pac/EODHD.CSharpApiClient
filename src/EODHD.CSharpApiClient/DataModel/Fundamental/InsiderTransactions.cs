@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -9,17 +11,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
     public sealed class InsiderTransactions
     {
         /// <summary>
-        /// Gets or sets the raw record date string, as an ISO date.
+        /// Gets or sets the record date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Date")]
-        private string DateStr { get; set; }
-
-        /// <summary>
-        /// Gets the record date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.DateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
         /// Gets or sets the owner Central Index Key (CIK).
@@ -32,17 +28,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string OwnerName { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw transaction date string, as an ISO date.
+        /// Gets or sets the transaction date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("TransactionDate")]
-        private string TransactionDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the transaction date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? TransactionDate => Utilities.ParseDate(this.TransactionDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? TransactionDate { get; set; }
 
         /// <summary>
         /// Gets or sets the transaction code.

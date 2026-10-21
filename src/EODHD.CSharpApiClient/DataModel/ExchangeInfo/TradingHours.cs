@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
 {
     /// <summary>
@@ -9,56 +11,32 @@ namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
     public sealed class TradingHours
     {
         /// <summary>
-        /// Gets or sets the raw wire value of the local open time.
+        /// Gets or sets the local open time.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Open")]
-        private string OpenStr { get; set; }
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? Open { get; set; }
 
         /// <summary>
-        /// Gets the local open time, parsed from the raw value.
+        /// Gets or sets the local close time.
         /// </summary>
-        [JsonIgnore]
-        public TimeOnly? Open => Utilities.ParseTime(this.OpenStr);
-
-        /// <summary>
-        /// Gets or sets the raw wire value of the local close time.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Close")]
-        private string CloseStr { get; set; }
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? Close { get; set; }
 
         /// <summary>
-        /// Gets the local close time, parsed from the raw value.
+        /// Gets or sets the open time in UTC.
         /// </summary>
-        [JsonIgnore]
-        public TimeOnly? Close => Utilities.ParseTime(this.CloseStr);
-
-        /// <summary>
-        /// Gets or sets the raw wire value of the open time in UTC.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("OpenUTC")]
-        private string OpenUTCStr { get; set; }
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? OpenUTC { get; set; }
 
         /// <summary>
-        /// Gets the open time in UTC, parsed from the raw value.
+        /// Gets or sets the close time in UTC.
         /// </summary>
-        [JsonIgnore]
-        public TimeOnly? OpenUTC => Utilities.ParseTime(this.OpenUTCStr);
-
-        /// <summary>
-        /// Gets or sets the raw wire value of the close time in UTC.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("CloseUTC")]
-        private string CloseUTCStr { get; set; }
-
-        /// <summary>
-        /// Gets the close time in UTC, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public TimeOnly? CloseUTC => Utilities.ParseTime(this.CloseUTCStr);
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? CloseUTC { get; set; }
 
         /// <summary>
         /// Gets or sets the working days of the exchange.

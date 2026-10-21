@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
 {
     /// <summary>
@@ -25,30 +27,18 @@ namespace EODHD.CSharpApiClient.DataModel.UpcomingEarnings
         public string Symbols { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw start of the requested date range string (ISO date).
+        /// Gets or sets the start of the requested date range.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("from")]
-        private string FromStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? From { get; set; }
 
         /// <summary>
-        /// Gets the start of the requested date range, parsed from the raw value.
+        /// Gets or sets the end of the requested date range.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? From => Utilities.ParseDate(this.FromStr);
-
-        /// <summary>
-        /// Gets or sets the raw end of the requested date range string (ISO date).
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("to")]
-        private string ToStr { get; set; }
-
-        /// <summary>
-        /// Gets the end of the requested date range, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? To => Utilities.ParseDate(this.ToStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? To { get; set; }
 
         /// <summary>
         /// Gets or sets the upcoming-earnings entries.

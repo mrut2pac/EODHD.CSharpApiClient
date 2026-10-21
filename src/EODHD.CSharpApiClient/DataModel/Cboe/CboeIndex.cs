@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Cboe
 {
     /// <summary>
@@ -22,14 +24,10 @@ namespace EODHD.CSharpApiClient.DataModel.Cboe
         [JsonPropertyName("feed_type")]
         public string FeedType { get; set; }
 
-        /// <summary>Gets or sets the raw wire value of the snapshot date.</summary>
-        [JsonInclude]
+        /// <summary>Gets or sets the snapshot date.</summary>
         [JsonPropertyName("date")]
-        private string DateStr { get; set; }
-
-        /// <summary>Gets the snapshot date, parsed from the raw value.</summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.DateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>Gets or sets the index close value.</summary>
         [JsonPropertyName("index_close")]
@@ -39,23 +37,15 @@ namespace EODHD.CSharpApiClient.DataModel.Cboe
         [JsonPropertyName("index_divisor")]
         public double? IndexDivisor { get; set; }
 
-        /// <summary>Gets or sets the raw wire value of the effective date.</summary>
-        [JsonInclude]
+        /// <summary>Gets or sets the effective date (single-index endpoint only).</summary>
         [JsonPropertyName("effective_date")]
-        private string EffectiveDateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? EffectiveDate { get; set; }
 
-        /// <summary>Gets the effective date (single-index endpoint only), parsed from the raw value.</summary>
-        [JsonIgnore]
-        public DateTime? EffectiveDate => Utilities.ParseDate(this.EffectiveDateStr);
-
-        /// <summary>Gets or sets the raw wire value of the review date.</summary>
-        [JsonInclude]
+        /// <summary>Gets or sets the review date (single-index endpoint only).</summary>
         [JsonPropertyName("review_date")]
-        private string ReviewDateStr { get; set; }
-
-        /// <summary>Gets the review date (single-index endpoint only), parsed from the raw value.</summary>
-        [JsonIgnore]
-        public DateTime? ReviewDate => Utilities.ParseDate(this.ReviewDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ReviewDate { get; set; }
 
         /// <summary>
         /// Gets or sets the index constituents. Populated only by the single-index endpoint

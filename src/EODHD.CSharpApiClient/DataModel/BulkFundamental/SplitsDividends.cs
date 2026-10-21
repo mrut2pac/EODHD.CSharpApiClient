@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
 {
     /// <summary>
@@ -24,32 +26,18 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public double? PayoutRatio { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw dividend date string as returned by the API.
-        /// Marked <see cref="JsonIncludeAttribute"/> so the private setter is populated during deserialization.
+        /// Gets or sets the dividend date, or <c>null</c> if unavailable.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("DividendDate")]
-        private string DividendDateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? DividendDate { get; set; }
 
         /// <summary>
-        /// Gets the parsed dividend date (ISO date), or <c>null</c> if unavailable.
+        /// Gets or sets the ex-dividend date, or <c>null</c> if unavailable.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? DividendDate => Utilities.ParseDate(this.DividendDateStr);
-
-        /// <summary>
-        /// Gets or sets the raw ex-dividend date string as returned by the API.
-        /// Marked <see cref="JsonIncludeAttribute"/> so the private setter is populated during deserialization.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("ExDividendDate")]
-        private string ExDividendDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the parsed ex-dividend date (ISO date), or <c>null</c> if unavailable.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? ExDividendDate => Utilities.ParseDate(this.ExDividendDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ExDividendDate { get; set; }
 
         /// <summary>
         /// Gets or sets the raw last-split-factor string as returned by the API (e.g. <c>"2:1"</c>).
@@ -64,17 +52,10 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public double? LastSplitFactor => Utilities.ParseSplitFactor(this.LastSplitFactorStr);
 
         /// <summary>
-        /// Gets or sets the raw last-split-date string as returned by the API.
-        /// Marked <see cref="JsonIncludeAttribute"/> so the private setter is populated during deserialization.
+        /// Gets or sets the last split date, or <c>null</c> if unavailable.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("LastSplitDate")]
-        private string LastSplitDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the parsed last split date (ISO date), or <c>null</c> if unavailable.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? LastSplitDate => Utilities.ParseDate(this.LastSplitDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? LastSplitDate { get; set; }
     }
 }

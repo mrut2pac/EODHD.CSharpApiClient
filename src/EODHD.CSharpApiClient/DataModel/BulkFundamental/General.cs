@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
 {
     /// <summary>
@@ -99,18 +101,11 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
         public string FiscalYearEnd { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw IPO date string as returned by the API.
-        /// Marked <see cref="JsonIncludeAttribute"/> so the private setter is populated during deserialization.
+        /// Gets or sets the IPO date, or <c>null</c> if unavailable.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("IPODate")]
-        private string ipoDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the parsed IPO date (ISO date), or <c>null</c> if unavailable.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? IPODate => Utilities.ParseDate(this.ipoDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? IPODate { get; set; }
 
         /// <summary>
         /// Gets or sets the international/domestic classification.

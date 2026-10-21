@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
 {
     /// <summary>
@@ -24,16 +26,10 @@ namespace EODHD.CSharpApiClient.DataModel.ExchangeInfo
         public string Type { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw closing time string (e.g. <c>"13:00"</c>).
+        /// Gets or sets the closing time on that day, in the exchange's local time zone (see <see cref="ExchangeDetails.Timezone"/>).
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("EarlyClose")]
-        private string EarlyCloseStr { get; set; }
-
-        /// <summary>
-        /// Gets the closing time on that day, in the exchange's local time zone (see <see cref="ExchangeDetails.Timezone"/>), parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public TimeOnly? EarlyClose => Utilities.ParseTime(this.EarlyCloseStr);
+        [JsonConverter(typeof(NaTolerantTimeConverter))]
+        public TimeOnly? EarlyClose { get; set; }
     }
 }

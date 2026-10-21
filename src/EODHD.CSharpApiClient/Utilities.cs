@@ -5,40 +5,11 @@ namespace EODHD.CSharpApiClient
 {
     /// <summary>
     /// Internal parsing helpers shared by the data-model classes for converting raw EODHD wire strings
-    /// (dates and split ratios) into typed values.
+    /// (split ratios) into typed values.
     /// </summary>
     internal static class Utilities
     {
         private static readonly char[] SplitFactorSeparators = new char[] { ':', '/' };
-        private static readonly string[] TimeFormats = new string[] { "H:mm", "H:mm:ss" };
-
-        /// <summary>
-        /// Parses an EODHD date string into a <see cref="DateTime"/>, returning <c>null</c> when the
-        /// value is missing or not a valid date.
-        /// </summary>
-        public static DateTime? ParseDate(string dateStr)
-        {
-            if(DateTime.TryParse(dateStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
-            {
-                return date;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Parses an EODHD time-of-day string (<c>"13:00"</c> or <c>"13:00:00"</c>) into a <see cref="TimeOnly"/>,
-        /// returning <c>null</c> when the value is missing or not a valid time.
-        /// </summary>
-        public static TimeOnly? ParseTime(string timeStr)
-        {
-            if(TimeOnly.TryParseExact(timeStr, TimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly time))
-            {
-                return time;
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// Parses an EODHD split ratio string (e.g. <c>"2.000000/1.000000"</c> or <c>"2:1"</c>) into the

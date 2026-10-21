@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Bonds
 {
     /// <summary>
@@ -27,17 +29,11 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw wire value of the date the record was last updated (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the date the record was last updated.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("UpdateDate")]
-        private string UpdateDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the date the record was last updated, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? UpdateDate => Utilities.ParseDate(this.UpdateDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? UpdateDate { get; set; }
 
         /// <summary>
         /// Gets or sets the German securities identification number (Wertpapierkennnummer).
@@ -76,30 +72,18 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
         public double? Price { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw wire value of the last trade date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the last trade date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("LastTradeDate")]
-        private string LastTradeDateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? LastTradeDate { get; set; }
 
         /// <summary>
-        /// Gets the last trade date, parsed from the raw value.
+        /// Gets or sets the maturity date.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? LastTradeDate => Utilities.ParseDate(this.LastTradeDateStr);
-
-        /// <summary>
-        /// Gets or sets the raw wire value of the maturity date (<c>yyyy-MM-dd</c>).
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Maturity_Date")]
-        private string MaturityDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the maturity date, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? MaturityDate => Utilities.ParseDate(this.MaturityDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? MaturityDate { get; set; }
 
         /// <summary>
         /// Gets or sets the yield to maturity, percent.
@@ -114,17 +98,11 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
         public string Callable { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw wire value of the next call date (<c>yyyy-MM-dd</c>), or <c>null</c>.
+        /// Gets or sets the next call date; <c>null</c> when there is none.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("NextCallDate")]
-        private string NextCallDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the next call date, parsed from the raw value; <c>null</c> when there is none.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? NextCallDate => Utilities.ParseDate(this.NextCallDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? NextCallDate { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum settlement amount (e.g. <c>"100000 EUR"</c>).

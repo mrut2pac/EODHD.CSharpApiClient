@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -14,17 +16,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw position date string, as an ISO date.
+        /// Gets or sets the position date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Date")]
-        private string DateStr { get; set; }
-
-        /// <summary>
-        /// Gets the position date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? Date => Utilities.ParseDate(this.DateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
         /// Gets or sets the total shares held, as a count.

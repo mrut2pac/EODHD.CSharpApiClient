@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -105,17 +107,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string FiscalYearEnd { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw IPO date string, as an ISO date.
+        /// Gets or sets the IPO date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("IPODate")]
-        private string IpoDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the IPO date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? IPODate => Utilities.ParseDate(this.IpoDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? IPODate { get; set; }
 
         /// <summary>
         /// Gets or sets the international/domestic classification.
@@ -163,17 +159,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public bool? IsDelisted { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw delisting date string (ISO date).
+        /// Gets or sets the delisting date of a delisted instrument.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("DelistedDate")]
-        private string DelistedDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the delisting date of a delisted instrument, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? DelistedDate => Utilities.ParseDate(this.DelistedDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? DelistedDate { get; set; }
 
         /// <summary>
         /// Gets or sets the company description.
@@ -221,17 +211,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public int? FullTimeEmployees { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw last-updated date string, as an ISO date.
+        /// Gets or sets the last-updated date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("UpdatedAt")]
-        private string updatedAtStr { get; set; }
-
-        /// <summary>
-        /// Gets the last-updated date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? UpdatedAt => Utilities.ParseDate(this.updatedAtStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the fund summary.

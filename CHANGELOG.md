@@ -7,8 +7,14 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Changed (breaking)
-- Date and time fields that were exposed as raw strings are now typed. Dates are parsed the same way as the existing
-  `General.IPODate`, so a blank or `"0000-00-00"` gives `null`. Times are parsed like `ExchangeEarlyCloseDay.EarlyClose`.
+- Date and time fields that were exposed as raw strings are now typed.
+  - The date and time properties listed here are plain settable properties, as are the previously get-only ones
+    described below. Each is read and written by `JsonSupport.NaTolerantDateConverter` (`DateTime?`) or
+    `JsonSupport.NaTolerantTimeConverter` (`TimeOnly?`), so a blank, `"NA"` or `"0000-00-00"` gives `null`.
+  - Serializing a model now writes the normalized value (`yyyy-MM-dd[ HH:mm:ss]`, `HH:mm:ss`) instead of the raw wire
+    text.
+  - This replaces the private raw string plus get-only parsed property behind `General.IPODate`, `Earning.Date` and others,
+    so those are now settable too, e.g. in test fakes. Their JSON keys are unchanged.
   - `DateTime?`:
     - bulk `BalanceSheetData` / `CashFlowData` / `IncomeStatementData` `.Date` / `.FilingDate`, `BulkEarnings.Date`
       and bulk `Highlights.MostRecentQuarter`
@@ -59,13 +65,12 @@ All notable changes to this project are documented here. The format is based on
   `JsonSupport.CaseInsensitiveDuplicateKeyConverter<T>` keeps the populated one.
 - Crypto `FundamentalData.Tech` (`CryptoTech.Developers`) and `FundamentalData.Resources` (`CryptoResources.Links` /
   `Thumbnail`).
-- New date and time fields are typed, parsed from the raw value the same way as the existing `General.IPODate`.
-  An unparsable value such as `"0000-00-00"` gives `null`.
+- New date and time fields are typed, using the same converters as above.
   - `DateTime?`: `General.DelistedDate`, `UpcomingEarnings.From` / `To`, `BulkEarnings.ReportDate`, and
     `MutualFundData.UpdateDate` / `InceptionDate` / `ExpenseRatioDate`.
   - `TimeOnly?`: `ExchangeEarlyCloseDay.EarlyClose`, the exchange's local closing time.
-- `JsonSupport.NumberTolerantStringConverter` (registered globally for REST and WebSocket) and
-  `JsonSupport.NaTolerantInt64Converter`.
+- `JsonSupport.NumberTolerantStringConverter` (registered globally for REST and WebSocket),
+  `JsonSupport.NaTolerantInt64Converter`, `JsonSupport.NaTolerantDateConverter` and `JsonSupport.NaTolerantTimeConverter`.
 
 ## [1.0.2] - 2026-09-28
 

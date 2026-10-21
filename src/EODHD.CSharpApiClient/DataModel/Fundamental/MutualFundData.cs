@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -27,17 +29,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? PrevClosePrice { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw date the fund data was last updated string (ISO date).
+        /// Gets or sets the date the fund data was last updated.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Update_Date")]
-        private string UpdateDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the date the fund data was last updated, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? UpdateDate => Utilities.ParseDate(this.UpdateDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? UpdateDate { get; set; }
 
         /// <summary>
         /// Gets or sets the net assets of the whole portfolio, across share classes (currency).
@@ -52,17 +48,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public decimal? ShareClassNetAssets { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw inception date string (ISO date).
+        /// Gets or sets the inception date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Inception_Date")]
-        private string InceptionDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the inception date, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? InceptionDate => Utilities.ParseDate(this.InceptionDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? InceptionDate { get; set; }
 
         /// <summary>
         /// Gets or sets the fund currency.
@@ -110,17 +100,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? ExpenseRatio { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw date of the expense ratio string (ISO date).
+        /// Gets or sets the date of the expense ratio.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("Expense_Ratio_Date")]
-        private string ExpenseRatioDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the date of the expense ratio, parsed from the raw value.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? ExpenseRatioDate => Utilities.ParseDate(this.ExpenseRatioDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ExpenseRatioDate { get; set; }
 
         /// <summary>
         /// Gets or sets the asset allocation rows keyed by ordinal index.

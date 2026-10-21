@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -25,30 +27,18 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? PayoutRatio { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw dividend date string, as an ISO date.
+        /// Gets or sets the dividend date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("DividendDate")]
-        private string DividendDateStr { get; set; }
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? DividendDate { get; set; }
 
         /// <summary>
-        /// Gets the dividend date, parsed from the raw string.
+        /// Gets or sets the ex-dividend date.
         /// </summary>
-        [JsonIgnore]
-        public DateTime? DividendDate => Utilities.ParseDate(this.DividendDateStr);
-
-        /// <summary>
-        /// Gets or sets the raw ex-dividend date string, as an ISO date.
-        /// </summary>
-        [JsonInclude]
         [JsonPropertyName("ExDividendDate")]
-        private string ExDividendDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the ex-dividend date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? ExDividendDate => Utilities.ParseDate(this.ExDividendDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? ExDividendDate { get; set; }
 
         /// <summary>
         /// Gets or sets the raw last-split factor string (e.g. "2:1").
@@ -63,17 +53,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? LastSplitFactor => Utilities.ParseSplitFactor(this.LastSplitFactorStr);
 
         /// <summary>
-        /// Gets or sets the raw last-split date string, as an ISO date.
+        /// Gets or sets the last-split date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("LastSplitDate")]
-        private string LastSplitDateStr { get; set; }
-
-        /// <summary>
-        /// Gets the last-split date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? LastSplitDate => Utilities.ParseDate(this.LastSplitDateStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? LastSplitDate { get; set; }
 
         /// <summary>
         /// Gets or sets the number of dividend payments per year, keyed by year.

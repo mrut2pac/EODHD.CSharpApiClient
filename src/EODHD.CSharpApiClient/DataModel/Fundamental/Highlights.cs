@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using EODHD.CSharpApiClient.JsonSupport;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -79,17 +81,11 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? EPSEstimateCurrentQuarter { get; set; }
 
         /// <summary>
-        /// Gets or sets the raw most-recent-quarter date string, as an ISO date.
+        /// Gets or sets the most-recent-quarter date.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("MostRecentQuarter")]
-        private string MostRecentQuarterStr { get; set; }
-
-        /// <summary>
-        /// Gets the most-recent-quarter date, parsed from the raw string.
-        /// </summary>
-        [JsonIgnore]
-        public DateTime? MostRecentQuarter => Utilities.ParseDate(this.MostRecentQuarterStr);
+        [JsonConverter(typeof(NaTolerantDateConverter))]
+        public DateTime? MostRecentQuarter { get; set; }
 
         /// <summary>
         /// Gets or sets the profit margin, as a ratio.
