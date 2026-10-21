@@ -6,10 +6,20 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
-### Changed
-These changes alter public types or members, but each one was unusable before: it was reachable only through a
-response that always threw, never bound any data, or was never populated by any call. They ship as a patch. Code
-that references one of them still needs a recompile, and may need a source edit.
+### Changed (breaking)
+- Date and time fields that were exposed as raw strings are now typed. Dates are parsed the same way as the existing
+  `General.IPODate`, so a blank or `"0000-00-00"` gives `null`. Times are parsed like `ExchangeEarlyCloseDay.EarlyClose`.
+  - `DateTime?`:
+    - bulk `BalanceSheetData` / `CashFlowData` / `IncomeStatementData` `.Date` / `.FilingDate`, `BulkEarnings.Date`
+      and bulk `Highlights.MostRecentQuarter`
+    - `ETFData.InceptionDate` / `DateOngoingCharge`, and `HistoricalComponent.StartDate` / `EndDate`
+    - `CboeIndex.Date` / `EffectiveDate` / `ReviewDate`
+    - `ScreenerResult.LastDayDataDate`, `SearchResult.PreviousCloseDate` and `UsDelayedQuote.PreviousCloseDate`
+    - `BondFundamentals.UpdateDate` / `LastTradeDate` / `MaturityDate` / `NextCallDate`, and `BondIssueData.IssueDate` /
+      `OfferingDate` / `FirstCouponDate` / `FirstTradingDay`
+  - `TimeOnly?`: `TradingHours.Open` / `Close` / `OpenUTC` / `CloseUTC`.
+  - The options models (`OptionData`, `OptionContract`) keep their raw strings for now. EODHD sends their timestamps in
+    inconsistent formats (`bid_date` is UTC with `Z`; `ask_date` has no zone).
 - `ETFData.AverageMarketCapitalizationMillions` is now `decimal?` and `MarketCapitalizationETF.Mega/Big/Medium/Small/Micro`
   are now `double?` (were `string`; see Fixed).
 - Bulk `BalanceSheetData.СashAndEquivalents` is renamed to `CashAndEquivalents` (see Fixed).

@@ -49,7 +49,7 @@ namespace EODHD.CSharpApiClient.UnitTests
         public async Task GetFundamentals_Etf_MixedMarketCapBucketsIndexNameAndSectors()
         {
             const string json =
-                "{\"ETF_Data\":{\"Index_Name\":\"S&P 500 Index\"," +
+                "{\"ETF_Data\":{\"Index_Name\":\"S&P 500 Index\",\"Inception_Date\":\"2004-09-23\",\"Date_Ongoing_Charge\":\"0000-00-00\"," +
                 "\"Market_Capitalisation\":{\"Mega\":\"0\",\"Big\":24.3164,\"Medium\":38.5743,\"Small\":30.2246,\"Micro\":6.4142}," +
                 "\"Sector_Weights\":{\"Real Estate\":{\"Equity_%\":\"99.1\",\"Relative_to_Category\":\"1.2\"}," +
                 "\"Communication Services\":{\"Equity_%\":0.8,\"Relative_to_Category\":null}}}}";
@@ -60,6 +60,8 @@ namespace EODHD.CSharpApiClient.UnitTests
 
             ETFData etf = data.ETFData;
             Assert.Equal("S&P 500 Index", etf.IndexName);
+            Assert.Equal(new DateTime(2004, 9, 23), etf.InceptionDate);
+            Assert.Null(etf.DateOngoingCharge);
             Assert.Equal(0d, etf.MarketCapitalization.Mega);
             Assert.Equal(24.3164, etf.MarketCapitalization.Big);
             Assert.Equal(6.4142, etf.MarketCapitalization.Micro);
@@ -89,6 +91,7 @@ namespace EODHD.CSharpApiClient.UnitTests
                 "{\"General\":{\"Exchange\":\"LSE\",\"OperatingMIC\":\"XLON\",\"ExchangeMarket\":\"LSE - MAIN MARKET\"," +
                 "\"IsDelisted\":true,\"DelistedDate\":\"2022-10-28\",\"MarketCap\":65959661940996}," +
                 "\"Components\":{\"0\":{\"Code\":\"NVDA\",\"Weight\":0.0789}}," +
+                "\"HistoricalTickerComponents\":{\"0\":{\"Code\":\"LEH\",\"StartDate\":\"1994-05-02\",\"EndDate\":\"2008-09-16\"}}," +
                 "\"Financials\":{\"Cash_Flow\":{\"yearly\":{\"2025-09-30\":{\"issuanceOfCapitalStock\":\"1105000000.00\"}}}}," +
                 "\"Statistics\":{\"MaxSupply\":21000000,\"LowAllTime\":0.05,\"HighAllTime\":126000}}";
 
@@ -101,6 +104,8 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(new DateTime(2022, 10, 28), data.General.DelistedDate);
             Assert.Equal(65959661940996m, data.General.MarketCap);
             Assert.Equal(0.0789, data.Components[0].Weight);
+            Assert.Equal(new DateTime(1994, 5, 2), data.HistoricalTickerComponents[0].StartDate);
+            Assert.Equal(new DateTime(2008, 9, 16), data.HistoricalTickerComponents[0].EndDate);
             Assert.Equal(1105000000d, data.Financials.CashFlow.Yearly["2025-09-30"].IssuanceOfCapitalStock);
             Assert.Equal(21000000m, data.Statistics.MaxSupply);
         }
@@ -232,8 +237,10 @@ namespace EODHD.CSharpApiClient.UnitTests
         {
             const string json =
                 "{\"0\":{\"General\":{\"Code\":\"AAPL\",\"OperatingMIC\":\"XNAS\",\"OpenFigi\":\"BBG000B9XRY4\"}," +
+                "\"Highlights\":{\"MostRecentQuarter\":\"2026-06-30\"}," +
                 "\"Earnings\":{\"Last_0\":{\"date\":\"2026-06-30\",\"reportDate\":\"2026-07-30\"}}," +
-                "\"Financials\":{\"Balance_Sheet\":{\"yearly_last_0\":{\"cashAndEquivalents\":\"1597000000.00\"}}," +
+                "\"Financials\":{\"Balance_Sheet\":{\"yearly_last_0\":{\"date\":\"2025-09-30\",\"filing_date\":\"0000-00-00\",\"cashAndEquivalents\":\"1597000000.00\"}}," +
+                "\"Income_Statement\":{\"yearly_last_0\":{\"date\":\"2025-09-30\",\"filing_date\":\"2025-10-31\"}}," +
                 "\"Cash_Flow\":{\"quarterly_last_0\":{\"filing_date\":\"2026-08-05\"}}}}}";
 
             using EodhdClient client = CreateClient(json);
@@ -244,8 +251,14 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal("XNAS", aapl.General.OperatingMIC);
             Assert.Equal("BBG000B9XRY4", aapl.General.OpenFigi);
             Assert.Equal(new DateTime(2026, 7, 30), aapl.Earnings["Last_0"].ReportDate);
+            Assert.Equal(new DateTime(2026, 6, 30), aapl.Earnings["Last_0"].Date);
+            Assert.Equal(new DateTime(2026, 6, 30), aapl.Highlights.MostRecentQuarter);
+            Assert.Equal(new DateTime(2025, 9, 30), aapl.Financials.BalanceSheet.YearlyLast0.Date);
+            Assert.Null(aapl.Financials.BalanceSheet.YearlyLast0.FilingDate);
+            Assert.Equal(new DateTime(2025, 9, 30), aapl.Financials.IncomeStatement.YearlyLast0.Date);
+            Assert.Equal(new DateTime(2025, 10, 31), aapl.Financials.IncomeStatement.YearlyLast0.FilingDate);
             Assert.Equal(1597000000d, aapl.Financials.BalanceSheet.YearlyLast0.CashAndEquivalents);
-            Assert.Equal("2026-08-05", aapl.Financials.CashFlow.QuarterlyLast0.FilingDate);
+            Assert.Equal(new DateTime(2026, 8, 5), aapl.Financials.CashFlow.QuarterlyLast0.FilingDate);
         }
 
         [Fact]
@@ -269,7 +282,7 @@ namespace EODHD.CSharpApiClient.UnitTests
         public async Task GetExchangeDetails_EarlyCloseDays_Deserialize()
         {
             const string json =
-                "{\"Name\":\"USA Stocks\",\"Code\":\"US\",\"ExchangeEarlyCloseDays\":{\"0\":{\"Holiday\":\"Pre-Christmas Thursday 2026\"," +
+                "{\"Name\":\"USA Stocks\",\"Code\":\"US\",\"TradingHours\":{\"Open\":\"09:30:00\",\"Close\":\"16:00:00\",\"OpenUTC\":\"13:30:00\",\"CloseUTC\":\"20:00:00\"},\"ExchangeEarlyCloseDays\":{\"0\":{\"Holiday\":\"Pre-Christmas Thursday 2026\"," +
                 "\"Date\":\"2026-12-24\",\"Type\":\"official\",\"EarlyClose\":\"13:00\"}}}";
 
             using EodhdClient client = CreateClient(json);
@@ -281,6 +294,10 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(new DateTime(2026, 12, 24), day.Date);
             Assert.Equal("official", day.Type);
             Assert.Equal(new TimeOnly(13, 0), day.EarlyClose);
+            Assert.Equal(new TimeOnly(9, 30), details.TradingHours.Open);
+            Assert.Equal(new TimeOnly(16, 0), details.TradingHours.Close);
+            Assert.Equal(new TimeOnly(13, 30), details.TradingHours.OpenUTC);
+            Assert.Equal(new TimeOnly(20, 0), details.TradingHours.CloseUTC);
         }
 
         [Fact]

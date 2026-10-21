@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
@@ -8,15 +9,30 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
     public sealed class IncomeStatementData
     {
         /// <summary>
-        /// Gets or sets the reporting-period end date (ISO date).
+        /// Gets or sets the raw wire value of the reporting-period end date.
         /// </summary>
-        public string Date { get; set; }
+        [JsonInclude]
+        [JsonPropertyName("Date")]
+        private string DateStr { get; set; }
 
         /// <summary>
-        /// Gets or sets the filing date (ISO date).
+        /// Gets the reporting-period end date, parsed from the raw value.
         /// </summary>
+        [JsonIgnore]
+        public DateTime? Date => Utilities.ParseDate(this.DateStr);
+
+        /// <summary>
+        /// Gets or sets the raw wire value of the filing date.
+        /// </summary>
+        [JsonInclude]
         [JsonPropertyName("filing_date")]
-        public string FilingDate { get; set; }
+        private string FilingDateStr { get; set; }
+
+        /// <summary>
+        /// Gets the filing date, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? FilingDate => Utilities.ParseDate(this.FilingDateStr);
 
         /// <summary>
         /// Gets or sets the reporting currency symbol.

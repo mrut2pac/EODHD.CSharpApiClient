@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 
 using EODHD.CSharpApiClient.DataModel.Cboe;
@@ -53,7 +52,8 @@ namespace EODHD.CSharpApiClient.IntegrationTests
 
             Skip.If(indices.Length == 0, "No Cboe indices to resolve a detail request from.");
             CboeIndex listed = indices[0];
-            DateTime date = DateTime.ParseExact(listed.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            Assert.NotNull(listed.Date);
+            DateTime date = listed.Date.Value;
 
             CboeIndex index = await client.GetCboeIndexAsync(listed.IndexCode, listed.FeedType, date);
 

@@ -35,6 +35,7 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Single(results);
             ScreenerResult result = results[0];
             Assert.Equal("AAPL", result.Code);
+            Assert.Equal(new DateTime(2026, 6, 12), result.LastDayDataDate);
             Assert.Equal(2606922247853m, result.MarketCapitalization);
             Assert.Null(result.EarningsShare);
             Assert.Equal(233.49, result.AverageVolume200D);

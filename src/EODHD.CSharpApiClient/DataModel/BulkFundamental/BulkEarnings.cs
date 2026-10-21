@@ -12,9 +12,17 @@ namespace EODHD.CSharpApiClient.DataModel.BulkFundamental
     public sealed class BulkEarnings
     {
         /// <summary>
-        /// Gets or sets the earnings date (ISO date).
+        /// Gets or sets the raw wire value of the earnings date.
         /// </summary>
-        public string Date { get; set; }
+        [JsonInclude]
+        [JsonPropertyName("Date")]
+        private string DateStr { get; set; }
+
+        /// <summary>
+        /// Gets the earnings date, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? Date => Utilities.ParseDate(this.DateStr);
 
         /// <summary>
         /// Gets or sets the raw report date string (ISO date).

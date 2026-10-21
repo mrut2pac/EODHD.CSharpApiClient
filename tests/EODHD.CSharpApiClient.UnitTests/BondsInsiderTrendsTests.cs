@@ -52,10 +52,10 @@ namespace EODHD.CSharpApiClient.UnitTests
             const string json =
                 "{\"ISIN\":\"DE000CB83CF0\",\"CUSIP\":\"000CB83CF\",\"Name\":\"Commerzbank, 7.75% 16mar2021, EUR\"," +
                 "\"Currency\":\"EUR\",\"Coupon\":\"7.750\",\"Price\":\"112.63\",\"Maturity_Date\":\"2021-03-15\"," +
-                "\"YieldToMaturity\":\"0.442\",\"Callable\":\"No\",\"NextCallDate\":null," +
+                "\"YieldToMaturity\":\"0.442\",\"Callable\":\"No\",\"NextCallDate\":null,\"UpdateDate\":\"2019-06-25\",\"LastTradeDate\":\"2019-06-24\"," +
                 "\"MinimumSettlementAmount\":\"100000 EUR\"," +
                 "\"ClassificationData\":{\"BondType\":\"Corporate bonds Germany\",\"IndustryGroup\":\"Banks\"}," +
-                "\"IssueData\":{\"IssueDate\":\"2011-03-16\",\"Issuer\":\"Commerzbank AG\",\"IssuerCountry\":\"Germany\"," +
+                "\"IssueData\":{\"IssueDate\":\"2011-03-16\",\"OfferingDate\":null,\"FirstCouponDate\":\"2012-03-16\",\"FirstTradingDay\":\"2011-03-17\",\"Issuer\":\"Commerzbank AG\",\"IssuerCountry\":\"Germany\"," +
                 "\"IssuerURL\":\"https://www.commerzbank.com/\"}}";
 
             using EodhdClient client = CreateClient(json, out FakeHttpTransport transport);
@@ -66,8 +66,14 @@ namespace EODHD.CSharpApiClient.UnitTests
             Assert.Equal(7.750, bond.Coupon);
             Assert.Equal(112.63, bond.Price);
             Assert.Equal(0.442, bond.YieldToMaturity);
-            Assert.Equal("2021-03-15", bond.MaturityDate);
+            Assert.Equal(new DateTime(2021, 3, 15), bond.MaturityDate);
             Assert.Null(bond.NextCallDate);
+            Assert.Equal(new DateTime(2019, 6, 25), bond.UpdateDate);
+            Assert.Equal(new DateTime(2019, 6, 24), bond.LastTradeDate);
+            Assert.Equal(new DateTime(2011, 3, 16), bond.IssueData.IssueDate);
+            Assert.Null(bond.IssueData.OfferingDate);
+            Assert.Equal(new DateTime(2012, 3, 16), bond.IssueData.FirstCouponDate);
+            Assert.Equal(new DateTime(2011, 3, 17), bond.IssueData.FirstTradingDay);
             Assert.Equal("Banks", bond.ClassificationData.IndustryGroup);
             Assert.Equal("Commerzbank AG", bond.IssueData.Issuer);
             Assert.Equal("https://www.commerzbank.com/", bond.IssueData.IssuerUrl);

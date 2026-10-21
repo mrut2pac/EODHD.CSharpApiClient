@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace EODHD.CSharpApiClient.DataModel.Bonds
@@ -8,28 +9,56 @@ namespace EODHD.CSharpApiClient.DataModel.Bonds
     public sealed class BondIssueData
     {
         /// <summary>
-        /// Gets or sets the issue date (<c>yyyy-MM-dd</c>).
+        /// Gets or sets the raw wire value of the issue date (<c>yyyy-MM-dd</c>).
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("IssueDate")]
-        public string IssueDate { get; set; }
+        private string IssueDateStr { get; set; }
 
         /// <summary>
-        /// Gets or sets the offering date (<c>yyyy-MM-dd</c>).
+        /// Gets the issue date, parsed from the raw value.
         /// </summary>
+        [JsonIgnore]
+        public DateTime? IssueDate => Utilities.ParseDate(this.IssueDateStr);
+
+        /// <summary>
+        /// Gets or sets the raw wire value of the offering date (<c>yyyy-MM-dd</c>).
+        /// </summary>
+        [JsonInclude]
         [JsonPropertyName("OfferingDate")]
-        public string OfferingDate { get; set; }
+        private string OfferingDateStr { get; set; }
 
         /// <summary>
-        /// Gets or sets the first coupon date (<c>yyyy-MM-dd</c>).
+        /// Gets the offering date, parsed from the raw value.
         /// </summary>
+        [JsonIgnore]
+        public DateTime? OfferingDate => Utilities.ParseDate(this.OfferingDateStr);
+
+        /// <summary>
+        /// Gets or sets the raw wire value of the first coupon date (<c>yyyy-MM-dd</c>).
+        /// </summary>
+        [JsonInclude]
         [JsonPropertyName("FirstCouponDate")]
-        public string FirstCouponDate { get; set; }
+        private string FirstCouponDateStr { get; set; }
 
         /// <summary>
-        /// Gets or sets the first trading day (<c>yyyy-MM-dd</c>).
+        /// Gets the first coupon date, parsed from the raw value.
         /// </summary>
+        [JsonIgnore]
+        public DateTime? FirstCouponDate => Utilities.ParseDate(this.FirstCouponDateStr);
+
+        /// <summary>
+        /// Gets or sets the raw wire value of the first trading day (<c>yyyy-MM-dd</c>).
+        /// </summary>
+        [JsonInclude]
         [JsonPropertyName("FirstTradingDay")]
-        public string FirstTradingDay { get; set; }
+        private string FirstTradingDayStr { get; set; }
+
+        /// <summary>
+        /// Gets the first trading day, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? FirstTradingDay => Utilities.ParseDate(this.FirstTradingDayStr);
 
         /// <summary>
         /// Gets or sets the coupon payment frequency.

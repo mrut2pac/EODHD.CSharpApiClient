@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -54,10 +55,17 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string DividendPayingFrequency { get; set; }
 
         /// <summary>
-        /// Gets or sets the inception date (ISO date).
+        /// Gets or sets the raw wire value of the inception date.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("Inception_Date")]
-        public string InceptionDate { get; set; }
+        private string InceptionDateStr { get; set; }
+
+        /// <summary>
+        /// Gets the inception date, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? InceptionDate => Utilities.ParseDate(this.InceptionDateStr);
 
         /// <summary>
         /// Gets or sets the maximum annual management charge (percent).
@@ -72,10 +80,17 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public double? OngoingCharge { get; set; }
 
         /// <summary>
-        /// Gets or sets the ongoing-charge date (ISO date).
+        /// Gets or sets the raw wire value of the ongoing-charge date.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("Date_Ongoing_Charge")]
-        public string DateOngoingCharge { get; set; }
+        private string DateOngoingChargeStr { get; set; }
+
+        /// <summary>
+        /// Gets the ongoing-charge date, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? DateOngoingCharge => Utilities.ParseDate(this.DateOngoingChargeStr);
 
         /// <summary>
         /// Gets or sets the net expense ratio (ratio).

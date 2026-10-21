@@ -1,3 +1,6 @@
+using System;
+using System.Text.Json.Serialization;
+
 namespace EODHD.CSharpApiClient.DataModel.Fundamental
 {
     /// <summary>
@@ -16,14 +19,30 @@ namespace EODHD.CSharpApiClient.DataModel.Fundamental
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the membership start date, as an ISO date.
+        /// Gets or sets the raw wire value of the membership start date.
         /// </summary>
-        public string StartDate { get; set; }
+        [JsonInclude]
+        [JsonPropertyName("StartDate")]
+        private string StartDateStr { get; set; }
 
         /// <summary>
-        /// Gets or sets the membership end date, as an ISO date.
+        /// Gets the membership start date, parsed from the raw value.
         /// </summary>
-        public string EndDate { get; set; }
+        [JsonIgnore]
+        public DateTime? StartDate => Utilities.ParseDate(this.StartDateStr);
+
+        /// <summary>
+        /// Gets or sets the raw wire value of the membership end date.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("EndDate")]
+        private string EndDateStr { get; set; }
+
+        /// <summary>
+        /// Gets the membership end date, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? EndDate => Utilities.ParseDate(this.EndDateStr);
 
         /// <summary>
         /// Gets or sets a flag indicating whether the component is active now.

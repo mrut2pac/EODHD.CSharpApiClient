@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace EODHD.CSharpApiClient.DataModel.Cboe
@@ -21,9 +22,14 @@ namespace EODHD.CSharpApiClient.DataModel.Cboe
         [JsonPropertyName("feed_type")]
         public string FeedType { get; set; }
 
-        /// <summary>Gets or sets the snapshot date.</summary>
+        /// <summary>Gets or sets the raw wire value of the snapshot date.</summary>
+        [JsonInclude]
         [JsonPropertyName("date")]
-        public string Date { get; set; }
+        private string DateStr { get; set; }
+
+        /// <summary>Gets the snapshot date, parsed from the raw value.</summary>
+        [JsonIgnore]
+        public DateTime? Date => Utilities.ParseDate(this.DateStr);
 
         /// <summary>Gets or sets the index close value.</summary>
         [JsonPropertyName("index_close")]
@@ -33,13 +39,23 @@ namespace EODHD.CSharpApiClient.DataModel.Cboe
         [JsonPropertyName("index_divisor")]
         public double? IndexDivisor { get; set; }
 
-        /// <summary>Gets or sets the effective date (single-index endpoint only).</summary>
+        /// <summary>Gets or sets the raw wire value of the effective date.</summary>
+        [JsonInclude]
         [JsonPropertyName("effective_date")]
-        public string EffectiveDate { get; set; }
+        private string EffectiveDateStr { get; set; }
 
-        /// <summary>Gets or sets the review date (single-index endpoint only).</summary>
+        /// <summary>Gets the effective date (single-index endpoint only), parsed from the raw value.</summary>
+        [JsonIgnore]
+        public DateTime? EffectiveDate => Utilities.ParseDate(this.EffectiveDateStr);
+
+        /// <summary>Gets or sets the raw wire value of the review date.</summary>
+        [JsonInclude]
         [JsonPropertyName("review_date")]
-        public string ReviewDate { get; set; }
+        private string ReviewDateStr { get; set; }
+
+        /// <summary>Gets the review date (single-index endpoint only), parsed from the raw value.</summary>
+        [JsonIgnore]
+        public DateTime? ReviewDate => Utilities.ParseDate(this.ReviewDateStr);
 
         /// <summary>
         /// Gets or sets the index constituents. Populated only by the single-index endpoint

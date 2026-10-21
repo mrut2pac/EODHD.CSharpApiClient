@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace EODHD.CSharpApiClient.DataModel.Screener
@@ -20,10 +21,17 @@ namespace EODHD.CSharpApiClient.DataModel.Screener
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the date of the most recent end-of-day data point.
+        /// Gets or sets the raw wire value of the date of the most recent end-of-day data point.
         /// </summary>
+        [JsonInclude]
         [JsonPropertyName("last_day_data_date")]
-        public string LastDayDataDate { get; set; }
+        private string LastDayDataDateStr { get; set; }
+
+        /// <summary>
+        /// Gets the date of the most recent end-of-day data point, parsed from the raw value.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime? LastDayDataDate => Utilities.ParseDate(this.LastDayDataDateStr);
 
         /// <summary>
         /// Gets or sets the latest adjusted closing price.
