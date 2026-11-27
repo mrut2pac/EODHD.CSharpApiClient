@@ -1,6 +1,8 @@
 # EODHD.CSharpApiClient
 
 [![NuGet](https://img.shields.io/nuget/v/EODHD.CSharpApiClient.svg)](https://www.nuget.org/packages/EODHD.CSharpApiClient)
+[![CI](https://github.com/mrut2pac/EODHD.CSharpApiClient/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mrut2pac/EODHD.CSharpApiClient/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/mrut2pac/EODHD.CSharpApiClient/blob/main/LICENSE)
 [![EODHD](https://img.shields.io/badge/EODHD-Financial%20APIs-5B6CF0)](https://eodhd.com/financial-apis)
 
 Pure-managed C# client for the [EOD Historical Data (EODHD)](https://eodhd.com/financial-apis) API — full REST coverage plus live (WebSocket) streaming.
@@ -10,11 +12,15 @@ Pure-managed C# client for the [EOD Historical Data (EODHD)](https://eodhd.com/f
 - **Testable transport** — `IHttpTransport` / `IWebSocketConnection` seams let you mock the network in unit tests; the API key is supplied at construction, never read from the environment.
 - **Debuggable** — deterministic build with a symbol package (`.snupkg`) and Source Link, so you can step straight into the client source.
 
+See [CHANGELOG.md](https://github.com/mrut2pac/EODHD.CSharpApiClient/blob/main/CHANGELOG.md) for the full version history.
+
 ## Install
 
 ```bash
 dotnet add package EODHD.CSharpApiClient
 ```
+
+Targets .NET 8.0 or later.
 
 ## Quick start (REST)
 
@@ -22,7 +28,7 @@ dotnet add package EODHD.CSharpApiClient
 using EODHD.CSharpApiClient;
 using EODHD.CSharpApiClient.DataModel;
 
-using EodhdClient client = new EodhdClient("YOUR_API_TOKEN");
+using EodhdClient client = new EodhdClient(Environment.GetEnvironmentVariable("EODHD_API_KEY"));
 
 UserInfo user = await client.GetUserInfoAsync();
 Console.WriteLine($"{user.Name}: {user.ApiRequests}/{user.DailyRateLimit} requests today");
@@ -31,7 +37,7 @@ List<HistoricalStockPrice> bars = await client.GetEndOfDayHistoricalStockPricesA
     "AAPL.US", new DateTime(2024, 1, 1), new DateTime(2024, 3, 31), EndOfDayPeriod.Daily);
 ```
 
-A demo token (`demo`) works against a handful of US symbols (e.g. `AAPL.US`, `MCD.US`) for trying the client without a paid key.
+The samples read the token from an `EODHD_API_KEY` environment variable so it stays out of your code. A demo token (`demo`) works against a handful of US symbols (e.g. `AAPL.US`, `MCD.US`) for trying the client without a paid key.
 
 ## Live streaming (WebSocket)
 
@@ -41,7 +47,7 @@ Messages are delivered as an `IAsyncEnumerable<T>`; the connection auto-reconnec
 using EODHD.CSharpApiClient.Live;
 using EODHD.CSharpApiClient.DataModel.Live;
 
-using EodhdWebSocketClient<ForexQuote> live = EodhdWebSocketClient.Forex("YOUR_API_TOKEN");
+using EodhdWebSocketClient<ForexQuote> live = EodhdWebSocketClient.Forex(Environment.GetEnvironmentVariable("EODHD_API_KEY"));
 
 await foreach (ForexQuote quote in live.ReadMessagesAsync(new[] { "EURUSD", "GBPUSD" }, cancellationToken))
 {
@@ -74,10 +80,10 @@ Unix-epoch timestamp fields carry their unit (`…Ms` / `…Sec`) and expose a `
 
 ## API key
 
-Pass your token to the constructor — the client never reads it from the environment or a config file:
+Pass your token to the constructor — the client never reads it from the environment or a config file itself, so where it comes from is up to you:
 
 ```csharp
-EodhdClient client = new EodhdClient("YOUR_API_TOKEN");
+EodhdClient client = new EodhdClient(Environment.GetEnvironmentVariable("EODHD_API_KEY"));
 ```
 
 For finer control (timeout, user agent, base URI, client-side rate limiting) use `EodhdClientOptions`:
@@ -85,7 +91,7 @@ For finer control (timeout, user agent, base URI, client-side rate limiting) use
 ```csharp
 EodhdClient client = new EodhdClient(new EodhdClientOptions
 {
-    ApiToken = "YOUR_API_TOKEN",
+    ApiToken = Environment.GetEnvironmentVariable("EODHD_API_KEY"),
     Timeout = TimeSpan.FromSeconds(60),
     MaxRequestsPerMinute = 1000,
 });
